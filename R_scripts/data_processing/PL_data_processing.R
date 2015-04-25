@@ -154,6 +154,8 @@ names(data)[grep("płeć", names(data))] <- "gender"
 ### Compute age
 data$age <- 2015 - data$birthdate
 
+
+
 ########################################
 ### END OF BASIC DATA PRE-PROCESSING ###
 ########################################
