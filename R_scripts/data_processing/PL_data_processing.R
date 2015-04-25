@@ -170,11 +170,13 @@ data <- data[, -grep("k9", enc2utf8(names(data)), perl = TRUE)]
 ############################
 
 ### Save recoded data to a file
+### Rename the dataset object properly
+data_pl <- data
 ### field separator is set to "\t"
-write.table(data, file = normalizePath("./Data/RawData/PL_main.txt"), 
+write.table(data_pl, file = normalizePath("./Data/RawData/PL_main.txt"), 
             sep = "\t", row.names = FALSE)
 ### Save recoded data to an R data object
-save(data, file = normalizePath("./Data/RawData/PL_main.RData"))
+save(data_pl, file = normalizePath("./Data/RawData/PL_main.RData"))
 
 ########################################
 ### END OF BASIC DATA PRE-PROCESSING ###
@@ -196,13 +198,15 @@ data_correct[,knowledge_vars] <- mapKnowledgeToCorrect(data_correct[,knowledge_v
 ### Save PL_main_correct dataset ###
 ####################################
 
+### Rename the dataset object properly
+data_pl_correct <- data_correct
 ### Save recoded dataset to a .txt file
 ### field seprator is set "\t"
-write.table(data_correct, 
+write.table(data_pl_correct, 
             file = normalizePath("./Data/MainData/PL_main_correct.txt"),
             sep = "\t", row.names = FALSE)
 ### Save recoded dataset to an R data object
-save(data_correct, file = normalizePath("./Data/MainData/PL_main_correct.RData"))
+save(data_pl_correct, file = normalizePath("./Data/MainData/PL_main_correct.RData"))
 
 ### Clean the workspace 
 ### (optional: uncomment to remove all objects from RStudio working memory)

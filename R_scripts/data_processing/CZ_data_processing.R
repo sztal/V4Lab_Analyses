@@ -73,7 +73,7 @@ sp[grep("BANK", sp, ignore.case = TRUE, perl = TRUE)] <- "Finance/Actuarial"
 sp[grep("demogr", sp, ignore.case = TRUE, perl = TRUE)] <- "Demography"
 sp[grep("dyplo", sp, ignore.case = TRUE, perl = TRUE)] <- "Diplomacy"
 sp[grep("DZIENN", sp, ignore.case = TRUE, perl = TRUE)] <- "Journalism"
-sp[grep("eko", sp, ignore.case = TRUE, perl = TRUE)] <- "Economy"
+sp[grep("^eko", sp, ignore.case = TRUE, perl = TRUE)] <- "Economy"
 sp[grep("FIN", sp, ignore.case = TRUE, perl = TRUE)] <- "Finance/Actuarial"
 sp[grep("GRAFIKA", sp, ignore.case = TRUE, perl = TRUE)] <- "Art"
 sp[grep("G. NAR", sp, ignore.case = TRUE, perl = TRUE)] <- "Economy"
@@ -83,8 +83,8 @@ sp[grep("KOMUNIKA", sp, ignore.case = TRUE, perl = TRUE)] <- "PR"
 sp[grep("KSI.*\\.", sp, ignore.case = TRUE, perl = TRUE)] <- "Finance/Actuarial"
 sp[grep("KWANT", sp, ignore.case = TRUE, perl = TRUE)] <- "Econometrics"
 sp[grep("MALAR", sp, ignore.case = TRUE, perl = TRUE)] <- "Art"
-sp[grep("MAT$", sp, ignore.case = TRUE, perl = TRUE)] <- "Math/CS"
-sp[grep("Matem\\.", sp, ignore.case = TRUE, perl = TRUE)] <- "Economy"
+sp[grep("MAT", sp, ignore.case = TRUE, perl = TRUE)] <- "Math/CS"
+sp[grep("Matem\\.", sp, ignore.case = TRUE, perl = TRUE)] <- "Math/CS"
 sp[grep("MST$", sp, ignore.case = TRUE, perl = TRUE)] <- "International_Rel"
 sp[grep("PODATK", sp, ignore.case = TRUE, perl = TRUE)] <- "Finance/Actuarial"
 sp[grep("POLIT", sp, ignore.case = TRUE, perl = TRUE)] <- "Political_Science"
@@ -134,6 +134,7 @@ for(i in 1:length(bdat)) {
       else if(nchar(bdat[i]) == 4) next
       else bdat[i] <- NA
 }
+data[, col] <- as.numeric(bdat)
 
 ### Convert gender to properly labelled factor
 col <- grep("płeć", enc2utf8(names(data)), perl = TRUE)
@@ -180,11 +181,13 @@ data <- data[, -grep("k9", enc2utf8(names(data)), perl = TRUE)]
 ############################
 
 ### Save recoded data to a file
+### Rename dataset object properly
+data_cz <- data
 ### field separator is set to "\t"
-write.table(data, file = normalizePath("./Data/RawData/CZ_main.txt"), 
+write.table(data_cz, file = normalizePath("./Data/RawData/CZ_main.txt"), 
             sep = "\t", row.names = FALSE)
 ### Save recoded data to an R data object
-save(data, file = normalizePath("./Data/RawData/CZ_main.RData"))
+save(data_cz, file = normalizePath("./Data/RawData/CZ_main.RData"))
 
 ########################################
 ### END OF BASIC DATA PRE-PROCESSING ###
@@ -206,13 +209,15 @@ data_correct[,knowledge_vars] <- mapKnowledgeToCorrect(data_correct[,knowledge_v
 ### Save CZ_main_correct dataset ###
 ####################################
 
+### Rename the dataser object properly
+data_cz_correct <- data_correct
 ### Save recoded dataset to a .txt file
 ### field seprator is set "\t"
-write.table(data_correct, 
+write.table(data_cz_correct, 
             file = normalizePath("./Data/MainData/CZ_main_correct.txt"),
             sep = "\t", row.names = FALSE)
 ### Save recoded dataset to an R data object
-save(data_correct, file = normalizePath("./Data/MainData/CZ_main_correct.RData"))
+save(data_cz_correct, file = normalizePath("./Data/MainData/CZ_main_correct.RData"))
 
 ### Clean the workspace 
 ### (optional: uncomment to remove all objects from RStudio working memory)
