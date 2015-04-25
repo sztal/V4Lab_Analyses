@@ -1,5 +1,9 @@
 ### It is recommended to open and use this script with UTF-8 encoding
 
+###################################
+### PL_main dataset preparation ###
+###################################
+
 ### This script transforms polish rawdata to a more tidy and usable format
 ### that is also free of non_ASCII characters.
 ### Load data
@@ -79,7 +83,7 @@ sp[grep("sgh", sp, ignore.case = TRUE, perl = TRUE)] <- "Bussiness_no_spec"
 sp[grep("turyst", sp, ignore.case = TRUE, perl = TRUE)] <- "Leisure_studies"
 sp[grep("turkol", sp, ignore.case = TRUE, perl = TRUE)] <- "Turkology"
 sp[grep("zarz[aą]?(dz)?", sp, ignore.case = TRUE, perl = TRUE)] <- "Management"
-col <- grep("kierunek", names(data), perl = TRUE, perl = TRUE)
+col <- grep("kierunek", names(data), perl = TRUE)
 data[, col] <- factor(sp, levels = enc2utf8(names(table(sp))))
 
 ### Convert work experience to properly labelled factor
@@ -156,6 +160,13 @@ names(data)[grep("płeć", enc2utf8(names(data)), perl = TRUE)] <- "gender"
 
 ### Compute age
 data$age <- 2015 - data$birthdate
+
+### Remove question k9 (since it has no truly correct answer)
+data <- data[, -grep("k9", enc2utf8(names(data)), perl = TRUE)]
+
+############################
+### Save PL_main dataset ###
+############################
 
 ### Save recoded data to a file
 ### field separator is set to "\t"
