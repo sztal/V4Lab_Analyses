@@ -4,7 +4,7 @@
 ### PL_main dataset preparation ###
 ###################################
 
-### This script transforms polish rawdata to a more tidy and usable format
+### This script transforms Polish rawdata to a more tidy and usable format
 ### that is also free of non_ASCII characters.
 ### Load data
 data <- read.csv(normalizePath("./Data/RawData/PL_rawdata.csv"), sep=";")
@@ -27,6 +27,7 @@ for(col in grep("^p[0-9]+", enc2utf8(names(data)), perl = TRUE)) {
       data[, col] <- factor(data[, col],
                             levels = c("Agree", "Disagree", "DontKnow"))
 }
+### Set string variables to character class
 for(col in grep("kierunek|id|rok", enc2utf8(names(data)), perl = TRUE)) {
       data[, col] <- as.character(data[, col])
 }
