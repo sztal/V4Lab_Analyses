@@ -170,13 +170,41 @@ data <- data[, -grep("k9", enc2utf8(names(data)), perl = TRUE)]
 
 ### Save recoded data to a file
 ### field separator is set to "\t"
-write.table(data, file = paste(normalizePath("./Data/RawData"), "PL_main.txt", sep="/"), 
+write.table(data, file = normalizePath("./Data/RawData/PL_main.txt"), 
             sep = "\t", row.names = FALSE)
-### Save recoded data to a R data object
-save(data, file = paste(normalizePath("./Data/RawData"), "PL_main.RData", sep="/"))
+### Save recoded data to an R data object
+save(data, file = normalizePath("./Data/RawData/PL_main.RData"))
 
 ########################################
 ### END OF BASIC DATA PRE-PROCESSING ###
 ########################################
 
 ### Recode KNOWLEDGE items to reflect correct and incorrect answers
+### load a script that maps answers to the correct answers
+source(normalizePath("./R_scripts/data_processing/processingTools.R"))
+
+### Load the map of the correct answers
+map <- read.csv(normalizePath("./Data/Maps/CorrectAnswersMap_KNOWLEDGE.csv"), row.names = 1)
+
+### Map respondents' answers to the correct answers
+data_correct <- data
+knowledge_vars <- grep("^k[0-9]+", names(data_correct), perl = TRUE)
+data_correct[,knowledge_vars] <- mapKnowledgeToCorrect(data_correct[,knowledge_vars], map, "PL")
+
+####################################
+### Save PL_main_correct dataset ###
+####################################
+
+### Save recoded dataset to a .txt file
+### field seprator is set "\t"
+write.table(data_correct, 
+            file = normalizePath("./Data/MainData/PL_main_correct.txt"),
+            sep = "\t", row.names = FALSE)
+### Save recoded dataset to an R data object
+save(data_correct, file = normalizePath("./Data/MainData/PL_main_correct.RData"))
+
+### Clean the workspace 
+### (optional: uncomment to remove all objects from RStudio working memory)
+# rm(list = ls())
+
+### !!! <--- END OF SCRIPT ---> !!! ###
