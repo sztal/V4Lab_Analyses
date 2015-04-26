@@ -213,3 +213,21 @@ save(data_pl_correct, file = normalizePath("./Data/MainData/PL_main_correct.RDat
 # rm(list = ls())
 
 ### !!! <--- END OF SCRIPT ---> !!! ###
+
+### Session info
+# sessionInfo()
+# 
+# R version 3.2.0 (2015-04-16)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: Ubuntu 14.04.2 LTS
+# 
+# locale:
+#       [1] LC_CTYPE=pl_PL.UTF-8       LC_NUMERIC=C               LC_TIME=pl_PL.UTF-8        LC_COLLATE=pl_PL.UTF-8    
+# [5] LC_MONETARY=pl_PL.UTF-8    LC_MESSAGES=pl_PL.UTF-8    LC_PAPER=pl_PL.UTF-8       LC_NAME=C                 
+# [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=pl_PL.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+#       [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# loaded via a namespace (and not attached):
+#       [1] tools_3.2.0

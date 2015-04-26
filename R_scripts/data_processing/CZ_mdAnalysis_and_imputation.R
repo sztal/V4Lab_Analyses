@@ -123,3 +123,26 @@ save(dat_cz1, file = normalizePath("./Data/MainData/dat_CZ1.RData"))
 # rm(list = ls())
 
 ### !!! <--- END OF SCRIPT ---> !!! ###
+
+### Session info
+# sessionInfo()
+# 
+# R version 3.2.0 (2015-04-16)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: Ubuntu 14.04.2 LTS
+# 
+# locale:
+#       [1] LC_CTYPE=pl_PL.UTF-8       LC_NUMERIC=C               LC_TIME=pl_PL.UTF-8       
+# [4] LC_COLLATE=pl_PL.UTF-8     LC_MONETARY=pl_PL.UTF-8    LC_MESSAGES=pl_PL.UTF-8   
+# [7] LC_PAPER=pl_PL.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+# [10] LC_TELEPHONE=C             LC_MEASUREMENT=pl_PL.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+#       [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+#       [1] mice_2.22       lattice_0.20-31 Rcpp_0.11.5    
+# 
+# loaded via a namespace (and not attached):
+#       [1] MASS_7.3-39         tools_3.2.0         nnet_7.3-9          rpart_4.1-9         grid_3.2.0         
+#[6] randomForest_4.6-10
