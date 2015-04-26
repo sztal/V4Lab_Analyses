@@ -5,6 +5,13 @@
 ### (sociodemographic variables are not addressed in this analysis)                 ###
 #######################################################################################
 
+### The general idea here is the following:
+### only missing data in KNOWLEDGE questions, OPINION questions and SOCECO questions (the lesferism-etatism axis and the matrix of social-economic beliefs) are addressed.
+### First respondents who have more tha 25% of missing data in KNOWLEDGE and/or OPINION questions and/or 3 NAs in SOCECO questions are detected. Then indicator variables are created to show which respondents have >25% of NAs in KNOWELDGE and which of them have >25% in OPINIONS and which of them have 3 NAs in SOCECO questions.
+### Next the MICE imputation technique is used to produce 10 probable values for each missing data point. From these ten values one is chosen - as the mean rounded to the nearest integer or as the mode if the variable is non-numerical - and inserted in the place of the missing data point. However this procedure us put in motion if and only if a respondent does not belong to the set of respondents with to many NAs in this particular set of item (KNOWLEDGE, OPINION or SOCECO). Those who do belong to this set are left with NAs and in general will not be considered in analyses addresing this set of items.
+### This procedure of the imputed value selection and respondents selection is implemented in a custom function (Function 6) is the processingTools.R script.
+
+
 ### Load data
 load(normalizePath("./Data/MainData/PL_selected.RData"))
 ### Save under more convenient name
