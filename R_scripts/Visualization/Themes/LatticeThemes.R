@@ -27,6 +27,7 @@ V4themes <- function(theme_name) {
             V4.theme$strip.background$col <- "gray"
             V4.theme$plot.polygon$col <- "gray3"
             V4.theme$plot.polygon$border <- "transparent"
+            V4.theme$dot.symbol$col <- "gray3"
       }
       return(V4.theme)
 }
