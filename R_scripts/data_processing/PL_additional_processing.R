@@ -67,6 +67,7 @@ data <- data[-which(data$age > 30), ]
 which(data$year_at_uni == "PHD")
 ### one respondent have to be excluded
 data <- data[-which(data$year_at_uni == "PHD"), ]
+data$year_at_uni <- droplevels(data$year_at_uni)
 
 #####################
 ### Save new data ###
