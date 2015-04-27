@@ -90,7 +90,7 @@ plotBinary <- function(data, ci=TRUE, reverse=FALSE, reorder=TRUE, vline=FALSE, 
                                   panel.dotplot(x, y, ...)
                                   panel.arrows(x0=lo, y0=y,
                                                x1=up, y1=y, code=3,
-                                               angle=90, length=0.05)
+                                               angle=90, length=0.05, col="gray3")
                             })
       }
       if(vline) dplot <- dplot + layer(panel.abline(v=0.5, lwd=.8, lty=2))

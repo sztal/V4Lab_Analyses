@@ -1,10 +1,10 @@
 #########################################################################
-### Analysis of distributions of the KNOWLEDGE items in PL the sample ###
+### Analysis of distributions of the KNOWLEDGE items in the CZ sample ###
 #########################################################################
 
 ### Load data
-load(normalizePath("./Data/MainData/dat_PL1.RData"))
-data <- dat_pl1
+load(normalizePath("./Data/MainData/dat_CZ1.RData"))
+data <- dat_cz1
 ### Restrict to the respondents with imputed missing values
 ### Restrict the dataset to KNOWLEDGE variables exclusively
 data <- data[data$knowIV == 0, grep("^k[0-9]+", names(data), perl = TRUE)]
@@ -36,7 +36,8 @@ rawscores <- apply(data, 1, sum)
 summary(rawscores)
 ### Graphical distributions of the rawscores (histogram)
 rawhist <- histogram(rawscores, xlab="Raw Score", ylab="Percent of Total", par.settings=V4bgw)
-### The histogram looks very symmetric and normalish; suggests good potential for scaling
+### The histogram looks not very symmetric and normalish
+### a little less potential for scaling than in the PL data?
 ### Normality of the distribution of the raw scores
 shapiro.test(rawscores) ### the distribution is not normal
 
