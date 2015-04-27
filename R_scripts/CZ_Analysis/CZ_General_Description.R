@@ -101,3 +101,31 @@ source(normalizePath("./R_scripts//data_processing/processingTools.R"))
 dataNA <- data[, grep("^[ok][0-9]+", names(data), perl = TRUE, invert = TRUE)]
 NAs <- apply(dataNA, 2, howManyNAs, frac = TRUE)
 NAchart <- barchart(NAs, par.settings = V4bgw, xlab = "Percent of NAs")
+
+### Clean the workspace 
+### (optional: uncomment to remove all objects from RStudio working memory)
+# rm(list = ls())
+
+### !!! <--- END OF SCRIPT ---> !!! ###
+
+### Session info
+# sessionInfo()
+# 
+# R version 3.2.0 (2015-04-16)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: Ubuntu 14.04.2 LTS
+# 
+# locale:
+#       [1] LC_CTYPE=pl_PL.UTF-8       LC_NUMERIC=C               LC_TIME=pl_PL.UTF-8       
+# [4] LC_COLLATE=pl_PL.UTF-8     LC_MONETARY=pl_PL.UTF-8    LC_MESSAGES=pl_PL.UTF-8   
+# [7] LC_PAPER=pl_PL.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+# [10] LC_TELEPHONE=C             LC_MEASUREMENT=pl_PL.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+#       [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+#       [1] reshape2_1.4.1      latticeExtra_0.6-26 lattice_0.20-31     RColorBrewer_1.1-2 
+# 
+# loaded via a namespace (and not attached):
+#       [1] plyr_1.8.1    tools_3.2.0   Rcpp_0.11.5   grid_3.2.0    stringr_0.6.2
