@@ -1,0 +1,94 @@
+---
+title: "PL KNOWLEDGE analysis"
+author: "Szymon Talaga"
+date: "27.04.2015"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r, echo=FALSE}
+#####################################################################
+### Analysis of distributions of the KNOWLEDGE items in PL sample ###
+#####################################################################
+
+### Load data
+load(normalizePath("./../Data/MainData/dat_PL1.RData"))
+data <- dat_pl1
+### Restrict to the respondents with imputed missing values
+### Restrict the dataset to KNOWLEDGE variables exclusively
+data <- data[data$knowIV == 0, grep("^k[0-9]+", names(data), perl = TRUE)]
+
+### Load additional packages and helper functions
+source(normalizePath("./../R_scripts//data_processing/processingTools.R"))
+source(normalizePath("./../R_scripts//Visualization/Themes//LatticeThemes.R"))
+library(RColorBrewer)
+library(lattice)
+library(latticeExtra)
+library(reshape2)
+
+### Items difficulty levels
+diff <- data.frame(apply(data, 2, mean, na.rm=TRUE))
+diff <- cbind(rownames(diff), diff)
+names(diff) <- c("Item", "Difficulty")
+diff[, 2] <- 1 - diff[, 2] ### change 'easiness' to 'difficulty'
+### Load V4 color theme
+V4bgw <- V4themes("standard_bgw")
+### Summarize with a dotplot
+### Load helper functions for visualization
+source(normalizePath("./../R_scripts//Visualization//PlottingFunctions.R"))
+```
+
+# Introduction
+This report presents basic analysis of the answers to the KNOWLEDGE questions the in PL sample. Firstly, it addresses the problem of the questions' difficulty levels (defined as the fraction of the respondents that failed to answer a particular question correctly). Secondly, it examines the distribution of the KNOWLEDGE raw scores. Here a raw score is defiened as the sum of the correct answers given by a respondent. This two subanalyses will yield some important insight into the level of economic/financial knowledge of the Polish respondents.
+
+# Items' difficulties
+First we define difficulty level of an item to be the fraction of respondents that failed to provide the correct answer to a question.
+With this definition in hand we can conduct a basic but quite insightful analysis of the KNOWLEDGE data. We computed difficulty levels of all 29 KNOWELDGE items and attached 95% Agresti-Coull confidence intervals for binomial proportions to them. Then we plotted this data against a line indicating difficulty of 0.5 (see the plot below).
+
+```{r, echo=FALSE, fig.width=5, fig.height=5}
+diffplot <- plotBinary(data, ci=TRUE, reverse=TRUE, vline=TRUE, theme=V4bgw)
+diffplot <- update(diffplot, xlab = "Item Difficulty")
+diffplot
+```
+
+Why this analysis is important? It is important because it shows which questions were easy for the respondents and which were hard. It is so due to the fact that the questions were dichotomous (0/1), so the difficulty level of 0.5 corresponds to a situation when a respondent does not have any specific knowledge (correct or incorrect) about an issue and basically tries to guess the answer. Accordingly when the diffuclty level of an item is lower than 0.5, then the question is easy - respondents tend to know the correct answer. And when the difficulty is higher than 0.5, then the question is hard (or maybe rather tricky) - respondents tend to think they know the answer while what they know is incorrect.  Moreover, confidence intervals allows us to determine which items are really 'easy', 'in-between' and 'tricky'. Every time the whiskers with bars cross the line in the middle of the plot, an item should be considered 'in-between' (with significance level of 0.05). Then all items that do not cross the line and are to the left of it should be considered 'easy' ones, and all not crossing and to the right 'tricky' ones.
+By this argument we were able to partition the set of the KNOWLEDGE items into three subsets: 'easy items', 'in-between items' and 'tricky items'. These sets contain the following elements:
+
+(elements are listed from the easiest to the trickiest)
+
+* **Easy items:** k21, k16, k29, k26, k12, k30, k22, k25, k13, k7, k28, k17, k24, k15, k18, k27, k3, k6
+* **In-between items:** k23, k4, k8, k19, k2, k11
+* **Tricky items:** k14, k5, k20, k10, k1
+
+# The raw scores distribution
+Now we turn to the problem of the raw scores and their distribution (we remind that a raw score is defined as the sum of the correct answers given by a respondent).
+We computed raw scores for all respondents and plotted their distribution as a histogram (see the plot below).
+
+```{r, echo=FALSE, fig.width=4, fig.height=4}
+### Analysis of the KNOWLEDGE raw scores
+### We define raw score to be the simple sum of the correct answers to the KNOWLEDGE questions
+rawscores <- apply(data, 1, sum)
+### Graphical distributions of the rawscores (histogram)
+rawhist <- histogram(rawscores, xlab="Raw Score", ylab="Percent of Total", par.settings=V4bgw)
+rawhist
+```
+
+The distribution is clearly symmetric and maybe normal, what implies good potential for the scaling of the whole set of items. However, a formal check of normality (Shapiro-Wilk test) yielded negative results. Nevertheless graphical inspection of the distribution confirms what was already suggested by the distribution of the items' difficulty levels - the items are of various difficulty levels and by this virtue they may be useful for the measurment of economic/financial knowledge.
+
+```{r, echo=FALSE}
+### Normality of the distribution of the raw scores
+shapiro.test(rawscores) ### the distribution is not normal
+```
+
+At the end we provide a numerical summary of the raw scores distribution. It shows that the raw scores have a wide range of 18 points (out of 30 possible) with min at 8 and max at 26. Moreover, it also shows that the distribution is slightly shifted to the right what is implied by median at 18 and mean at 17.85, so on average respondents were slightly better than guessing.
+
+```{r, echo=FALSE}
+summary(rawscores)
+```
+
+The shift of the mean to 17.85 from 15 (the expected score of a guessing person) was proved to be statistically significant (95% confidence interval of the mean is: [17.40 - 18.29]). It means that on average respondents knew correct answers to about 6 questions (6 + 24/2 = 6 + 12 = 18). This calculation is of course based on an assumption that all 24 remaining questions were guessed.
+
+```{r, echo=FALSE}
+t.test(rawscores, alternative="greater", mu=15)
+```
