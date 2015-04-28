@@ -1,0 +1,269 @@
+---
+title: "PL KNOWLEDGE scaling"
+author: "Szymon Talaga"
+date: "28.04.2015"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+# Introduction
+The scaling procedure that is presented here uses the Mokken Scale technique, which is an non-parametric IRT technique that allows prodcution of high-quality ordinal scales. Mokken scales are useful because they posses two very important properties: monotonous homogeneity and double monotonicity. Monotonous homogeneity means that in a proper Mokken scale it is assured that an intenisty of a respondent's trait (in this case it would be economic/financial knowledge) is positively correlated with a probability of he or she giving the correct anwer to a question. It ensures correct ordinal measurement of a trait in which the sum of the correct answers is a sufficient estimator of the trait.
+
+Double monotonicity means that for every person the item ordering by difficulty is invariant. In other words it means that the ordering of the items from the easiest to the most difficult stays the same regardless of a respondent in question. As a consequence this property means that the fraction of incorrect answers to an item is a sufficient estimator of its difficulty level.
+
+The main aim of this script is to test whether this two assumption hold in the case of the PL sample and what subset(s) yield the best scale(s). All the tests conducted here will be based on the inspection of four statistics:
+
+* \#ac: theoretical maximal number of the possible violations of the model
+* \#vi: number of the actual violations in the data
+* \#zsig : number of violations that are considered statistically significant
+* \#crit: special summary statistic that combines the former three; values above 40 implies moderate violations of the model assumptions; values above 80 implies strong violation
+
+The aim of the first part of the analysis is to detect and remove poorly scaling items. Then it will be possible to use inductive techniques to find items that form the best scale or scales.
+
+```{r, echo=FALSE}
+### Load data
+load(normalizePath("./../Data/MainData/dat_PL1.RData"))
+data <- dat_pl1
+### Restrict to the respondents with imputed missing values
+### Restrict the dataset to KNOWLEDGE variables exclusively
+data <- data[data$knowIV == 0, grep("^k[0-9]+", names(data), perl = TRUE)]
+### Load additional packages and helper functions
+source(normalizePath("./../R_scripts//data_processing/processingTools.R"))
+source(normalizePath("./../R_scripts//Visualization/Themes//LatticeThemes.R"))
+library(RColorBrewer)
+library(lattice)
+library(latticeExtra)
+library(reshape2)
+library(poLCA)
+library(scatterplot3d)
+library(MASS)
+library(mokken)
+library(knitr)
+library(psych)
+library(survival)
+library(doBy)
+### Load V4 color theme
+V4bgw <- V4themes("standard_bgw")
+```
+
+# Scaling using the Mokken Scale approach
+First we use inductive technique based on a genetic algorithm to find subset of items that form the best scales.
+
+```{r, echo=FALSE}
+### Inductive search for the best scales in the set of items (genetic algorithm approach)
+scale = aisp(data, search="ga")
+scale
+```
+
+It is clear that the data does not allow creation of long and good Mokken Scales. The only possibility is to make a 4-items Mokken Scale out of items: k8, k21, k22 and k30. Therefore now we will asses the quality of this scale.
+
+```{r, echo=FALSE}
+scale = aisp(data, search="ga")
+### The best 4-items scale (k8, k21, k22, k30)
+data4 <- data[, c("k8", "k21", "k22", "k30")]
+### Check the monotonous homogeneity assumption
+mono4 <- check.monotonicity(data4)
+summary(mono4)
+```
+
+We see that the scale conforms well to the monotonous homogeneity assumption. Now we will check the double monotonicity assumption.
+
+```{r, echo=FALSE}
+### Check the double monotonicity assumption (using the restscores method)
+rest4 <- check.restscore(data4) ### conforms well to the assumption
+summary(rest4)
+```
+
+It appears it also conforms well to the double monotonicity assumption. Therefore it means that the scale provides ordinal measurement that allows treating raw sums of correct answers as sufficient estimators of the true level of the trait (economic/financial knowledge). Moreover items ordering by difficulty levels is ivariant. Summing up, it implies that although the scale is of rather low quality it still is a formal Mokken Scale and may be used to asses the level of economic/financial knowledge.
+
+However one thing is still to be done. The discrimiatory power of the scale has to be assesed. This can be done (at basic level) by inspecting the distribution of the scale scores (see the plot below).
+
+```{r, echo=FALSE, fig.widht=4, fig.height=4}
+### 4-items scale scores
+know4 <- apply(data4, 1, sum)
+### Distribution of the 4-items scale scores
+histogram(know4, par.settings=V4bgw, xlab="4-items Scale Scores", ylab="Percent of Total")
+### The distribution is strongly left-skewed what implies that the scale does not discriminate between respondents with high economic/financial knowledge, but do discriminate between thos of the poor knowledge.
+```
+
+The distribution is strongly left-skewed what implies that the scale does not discriminate between respondents with high economic/financial knowledge, but do discriminate between those of the poor knowledge.
+
+The analysis proves that the data does not conform to the Mokken model in general. Only the 4-items scale has barely satisfactory global scaling properties and allows some basic discrimination between respondents in regard to the economic/financial knowledge. Therefore we will also try to scale the KNOWLEDGE items set using the Classical Test Theory approach.
+
+# Scaling using the Classical Test Theory Approach
+
+```{r, echo=FALSE}
+######################################
+### CLASSICAL TEST THEORY APPROACH ###
+######################################
+
+### Load data
+load(normalizePath("./../Data/MainData/dat_PL1.RData"))
+data <- dat_pl1
+### Restrict to the respondents with imputed missing values
+### Restrict the dataset to KNOWLEDGE variables exclusively
+data <- data[data$knowIV == 0, grep("^k[0-9]+", names(data), perl = TRUE)]
+```
+
+We check the realibility of the entire set of items and we determine which items should be deleted to obtain a better scale.
+
+```{r, echo=FALSE}
+### Check reliability
+a <- alpha(data)
+round(a$total[1:2], 2)
+round(a$alpha.drop[, 1:2], 2)
+```
+
+The scale has at most satisfactory reliability. It is also clear that several items need to be removed. These are items k5, k11, k20 and k24 due to the negative correlation with the scale and item k14 becuase it lowers the reliability of the scale.
+
+```{r, echo=FALSE}
+### Drop items that are negatively correlated with the scale
+### (k5, k11, k20, k24)
+dataCTT <- data[, grep("5|11|20|24|14", names(data), perl=TRUE, invert=TRUE)]
+### Check reliability
+a <- alpha(dataCTT)
+round(a$total[1:2], 2)
+round(a$alpha.drop[, 1:2], 2)
+```
+
+Now no further items can be removed to better the scale, thus we arrived at the final version of it.
+
+The distribution of the scale scores is quite symmetric what implies it may discriminate better than the 4-items Mokken Scale (see the plot below). On the other hand it does not posses the specific properties (monotonous homogeneity and double monotonicity) of a Mokken Scale.
+
+```{r, echo=FALSE}
+### The distribution of the CTT scale scores
+CTTscale <- apply(dataCTT, 1, sum)
+histogram(CTTscale, par.settings=V4bgw, xlab="CTT Scale Score", ylab="Percent of Total",
+          xlim=c(-1,26))
+summary(CTTscale)
+shapiro.test(CTTscale) ### The distribution is not strictly normal
+### Nicely symmetric distribution
+```
+
+Therefore this scale may be considered satisfactory, but again it is rather of only low quality. It allows better discrimination amongst respondents with higher economic/financial knowledge, but it does not formally ensure that the scale scores fully and properly reflect economic/financial knowledge of respondents.
+
+# Assesment of theoretical validity of the scales
+Now we move to the last stage of this analysis where theoretical validity of the scales will be assesed. The main part of this analysis is aimed at examining mean differences respondents enrolled in different types of university programmes. We compare those studying social sciences, humanities and art (SSHA), economic, bussiness, management and financial studies (EBMF) and those enrolled in STEM programmes (STEM. It is expected that EBMF will have higher mean score that the other groups.
+
+Additionaly we will check wheter the economic/financial knowledge grow with the another years of education. We hypothesize that there should be positive (linear) trend in the EBMF group and no such trend in the others, since this kind of knowledge is taught mainly in the EBMF types of programmes.
+
+```{r, echo=FALSE}
+### Load data
+load(normalizePath("./../Data/MainData/dat_PL1.RData"))
+data <- dat_pl1
+### Load 4-items Mokken scale dataset and CTT scale dataset
+### Restrict the dataset to KNOWLEDGE variables exclusively
+dataCTT <- data[data$knowIV == 0, grep("^k[0-9]+|edu.*3|yea.*uni", names(data), perl = TRUE)]
+dataCTT <- dataCTT[, grep("5|11|20|24|14", names(dataCTT), perl=TRUE, invert=TRUE)]
+dataCTT$CTT <- apply(dataCTT[,grep("edu.*3|yea.*uni", names(dataCTT), perl=TRUE, invert=TRUE)],
+                     1, sum)
+data4 <- data[data$knowIV==0, grep("^k(8|21|22|30)|edu.*3|yea.*uni", names(data), perl=TRUE)]
+data4$Mokken4 <- apply(data4[, grep("^k[0-9]+", names(data4), perl=TRUE)], 1, sum)
+```
+
+## Theoretical validity of the 4-items Mokken Scale
+Numerical values of the group means suggest that indeed the EMBF group scores higher than the rest (see the plot below as well).
+
+```{r, echo=FALSE, fig.widht=4, fig.height=4}
+### Scores distributions among eduprog groups: EBMF, SSHA and STEM
+tapply(data4$Mokken4, data4$eduprog3, summary)
+bwplot(Mokken4 ~ eduprog3, data=data4, par.settings=V4bgw,
+       ylab = "4-items Mokken Scale Score")
+```
+
+The formal assesment (using a linear model with dummy coding that compares SSHA and STEM groups against the EMBF group) proved that observed differences are statisticakky significant and 'explain' about 14.5% of the variance of the 4-items Mokken Scale.
+
+```{r, echo=FALSE}
+### Formal test of the differences
+### We use dummy coding that compares the SSHA and STEM groups to the EBMF group
+summary(lm(Mokken4 ~ eduprog3, data=data4))
+### Both differences are highly significant and the type of education explains about 14.5% of the variance
+```
+
+Now we turn to the change of the level of the knowledge over the years of education. Visual inspection shows that there are some trends in the three groups (in the STEM group the trend even appears to be negative).
+
+```{r, echo=FALSE, fig.width=4, fig.height=4}
+### The change of knowledge over the years of education in the 4-items Mokken Scale
+### Save the year_at_uni variables as an integer variables
+### First we collapse MA_1 and MA_2 to one group becuase of the to few respondents in the MA_2
+data4$year_at_uni <- recodeVar(data4$year_at_uni, src="MA_2", tgt="MA_1")
+data4$uniyear <- as.numeric(data4$year_at_uni)
+### Plot of the linear trends in the groups
+xyplot(Mokken4 ~ uniyear | eduprog3, data=data4, par.settings=V4bgw,
+       scales=list(x=list(labels=as.integer(0:4), tick.number=4)),
+       xlab="Study Year", ylab="4-items Mokken Scale",
+       panel=function(x, y, ...) {
+       panel.xyplot(x, y, ...)
+       panel.lmline(x, y, ...)
+       })
+```
+
+However this observation must be confronted with formal tests. Again we use linear models in the groups in which the Mokken Scale score is the dependent variable and the year at the university the independent one (we collapsed those at their second year of MA with those at the first due to the very few respondents in the former).
+
+```{r, echo=FALSE}
+### Regression models in the groups
+lmEBMF <- lm(Mokken4 ~ uniyear, data=data4, subset=data4$eduprog3=="EBMF")
+summary(lmEBMF) # No effect of the Study Year in the EBMF group
+lmSSHA <- lm(Mokken4 ~ uniyear, data=data4, subset=data4$eduprog3=="SSHA")
+summary(lmSSHA) # No effect of the Study Year in the SSHA group
+lmSTEM <- lm(Mokken4 ~ uniyear, data=data4, subset=data4$eduprog3=="STEM")
+summary(lmSTEM) # No effect of the Study Year in the STEM group
+```
+
+Clearly none of the trends is significant.
+
+Summing up the theoretical validity of the scale seems to be proved to some extent, althought lack of the trend in the EBMF is somehow surprising.
+
+## Theoretical validity of the 22-items Classical Test Theory Scale
+Numerical values of the group means suggest again that indeed the EMBF group scores higher than the rest (see the plot below as well).
+
+```{r, echo=FALSE, fig.width=4, fig.height=4}
+### Scores distributions among eduprog groups: EBMF, SSHA and STEM
+tapply(dataCTT$CTT, data4$eduprog3, summary)
+bwplot(CTT ~ eduprog3, data=dataCTT, par.settings=V4bgw,
+       ylab = "22-items CTT Scale")
+```
+
+The formal test (again a linear model with dummy coding of SSHA and STEM against EBMF) proved that the observed difference is statistically significant.
+
+```{r, echo=FALSE}
+### Formal test of the differences
+### We use dummy coding that compares the SSHA and STEM groups to the EBMF group
+summary(lm(CTT ~ eduprog3, data=dataCTT))
+### Both differences are highly significant and the type of education explains about 24.3% of the variance
+```
+
+Now we turn to the change of the level of the knowledge over the years of education. Visual inspection shows that there are some trends in the three groups (in the STEM group the trend even appears to be negative).
+
+```{r, echo=FALSE, fig.width=4, fig.height=4}
+### The change of knowledge over the years of education in the 22-items CTT Scale
+### Save the year_at_uni variables as an integer variables
+### First we collapse MA_1 and MA_2 to one group becuase of the to few respondents in the MA_2
+dataCTT$year_at_uni <- recodeVar(dataCTT$year_at_uni, src="MA_2", tgt="MA_1")
+dataCTT$uniyear <- as.numeric(dataCTT$year_at_uni)
+### Plot of the linear trends in the groups
+xyplot(CTT ~ uniyear | eduprog3, data=dataCTT, par.settings=V4bgw,
+       scales=list(x=list(labels=as.integer(0:4), tick.number=4)),
+       xlab="Study Year", ylab="22-items CTT Score",
+       panel=function(x, y, ...) {
+             panel.xyplot(x, y, ...)
+             panel.lmline(x, y, ...)
+       })
+```
+
+However this observation must be confronted with formal tests. Again we use linear models in the groups in which the Mokken Scale score is the dependent variable and the year at the university the independent one (we collapsed those at their second year of MA with those at the first due to the very few respondents in the former).
+
+```{r, echo=FALSE}
+### Regression models in the groups
+lmEBMF <- lm(CTT ~ uniyear, data=dataCTT, subset=data4$eduprog3=="EBMF")
+summary(lmEBMF) # No effect of the Study Year in the EBMF group
+lmSSHA <- lm(CTT ~ uniyear, data=dataCTT, subset=data4$eduprog3=="SSHA")
+summary(lmSSHA) # No effect of the Study Year in the SSHA group
+lmSTEM <- lm(CTT ~ uniyear, data=dataCTT, subset=data4$eduprog3=="STEM")
+summary(lmSTEM) # No effect of the Study Year in the STEM group
+```
+
+Clearly none of the trends is significant.
+
+Summing up the theoretical validity of the scale seems to be proved to some extent, althought lack of the trend in the EBMF is (again) somehow surprising.
