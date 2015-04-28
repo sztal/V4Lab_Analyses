@@ -28,6 +28,9 @@ V4themes <- function(theme_name) {
             V4.theme$plot.polygon$col <- "gray3"
             V4.theme$plot.polygon$border <- "transparent"
             V4.theme$dot.symbol$col <- "gray3"
+            V4.theme$plot.symbol$col <- "gray3"
+            V4.theme$box.umbrella$col <- "gray3"
+            V4.theme$box.rectangle$col <- "black"
       }
       return(V4.theme)
 }
