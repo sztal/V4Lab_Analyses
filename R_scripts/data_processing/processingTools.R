@@ -283,3 +283,429 @@ getDataFromMIDS <- function(impdata, data, stats = NULL, rnd = FALSE, exclude_ob
       else return(DF)
 }
 ### !!! <--- Function 6 ---> !!! ### (END)
+
+### !!! <--- Function 7 ---> !!! ### (START)
+##############################################################
+### MAP OPINION ANSWERS TO LIBERALISM AND SOCIALISM SCALES ###
+##############################################################
+mapOPINION <- function(data, map, country, liberal, verbose=FALSE) {
+      ### This function maps answers from the OPINION item bank to liberalism and socialism scales' answers
+      ### 1st argument is a data.frame containing only the OPINION items
+      ### 2nd argument is a data.frame with the map of the scales' answers
+      ### 3rd arguments is a country code (PL or CZ)
+      ### 4th arguments is the scale flag (the liberalism scale is returned if TRUE; FALSE returns the socialism scale)
+      ### 5th argument is a flag that indicates wheter information about the execution of the function should be returned
+      ### The map should have 4 columns: 1st is the answers for the liberalism scale (PL); 2nd is the answers for the socialism scale (PL); 3rd and 4th stores the scales' values for the CZ scales
+      
+      ### IMPORTANT! This function should be used only on data with no non-ASCII characters
+      
+      ### Check whether the input data is OK
+      stopifnot(is.data.frame(data), is.data.frame(map), dim(map)[2] == 4,
+                any(grepl("PL", names(map), perl = TRUE, ignore.case = TRUE)) | any(grepl("CZ", names(map), perl = TRUE, ignore.case = TRUE)),
+                is.character(country) & length(country) == 1,
+                is.logical(verbose) & length(verbose) == 1,
+                is.logical(liberal) & length(liberal) == 1)
+      
+      ### Get proper country code
+      cntry <- names(map)[grep(country, names(map), perl = TRUE, ignore.case = TRUE)]
+      if(liberal) cntry <- grep("lib", cntry, perl=TRUE, ignore.case=TRUE, value=TRUE)
+      else cntry <- grep("soc", cntry, perl=TRUE, ignore.case=TRUE, value=TRUE)
+      
+      ### Inner function that maps the answer of a respondent to scales
+      mapRespondent <- function(resvec, map, country, liberal) {
+            ### Check wheter the input data is OK
+            stopifnot(is.data.frame(resvec) | is.vector(resvec),
+                      !is.null(names(resvec)),
+                      all(is.element(names(resvec), rownames(map))),
+                      is.character(country) & length(country) == 1)
+            ### Convert resvec to character vector if necessary
+            if(!is.vector(resvec)) {
+                  resvec_n <- names(resvec)
+                  resvec <- as.character(lapply(resvec, as.character))
+                  names(resvec) <- resvec_n
+            }
+            
+            ### Check respondent's answers
+            correct_vec <- vector(mode = "numeric", length = length(resvec))
+            names(correct_vec) <- names(resvec)
+            #print(resvec)
+            for(item in names(resvec)) {
+                  if(!(item %in% rownames(map))) {
+                        stop(message = "items in data and items in map do not match")
+                  }
+                  if(is.na(map[item, cntry]) | is.null(map[item, cntry]) | map[item, cntry] == "") {
+                        next
+                  }
+                  if(verbose) print(sprintf("---Item : %s", item))
+                  ans <- as.character(resvec[item])
+                  if(verbose) print(sprintf("ans -> %s", as.character(ans)))
+                  corr_ans <- as.character(map[item, cntry])
+                  if(verbose) print(sprintf("corr_ans -> %s", as.character(corr_ans)))
+                  if(is.na(ans)) {
+                        correct_vec[item] <- NA
+                        if(verbose) print(sprintf("%s <- NA", item))
+                  }
+                  else if(as.character(ans) == as.character(corr_ans)) {
+                        correct_vec[item] <- 1
+                        if(verbose) print(sprintf("%s <- 1", item))
+                  }
+                  else {
+                        correct_vec[item] <- 0
+                        if(verbose) print(sprintf("%s <- 0", item))
+                  }
+            }
+            return(correct_vec)
+      }
+      ### Map respondents' answers
+      mapped_data <- data
+      #print(mapped_data)
+      mapped_data[ , ] <- 0
+      for(i in 1:dim(data)[1]) {
+            if(verbose) print(sprintf("RESPONDENT No. %d", i))
+            resp <- data[i, ]
+            #print(resp)
+            mapped_resp <- mapRespondent(resp, map, cntry, liberal)
+            #print(mapped_resp)
+            mapped_data[i, ] <- mapped_resp
+      }
+      if(liberal) substr(names(mapped_data), 1, 1) <- "l"
+      else substr(names(mapped_data), 1, 1) <- "s"
+      return(mapped_data)
+}
+### !!! <--- Function 7 ---> !!! ### (END)
+
+### !!! <--- Function 8 ---> !!! ### (START)
+################################
+### COMPUTE UNFOLDING ERRORS ###
+################################
+unfoldingErrors <- function(vec) {
+      ### This function computes the number of violations of the unfolding model in a binary numeric data vector
+      ### It takes 1 argument
+      ###   - vec: a numeric binary data vector
+
+      vec <- as.numeric(vec)
+      ### Check the input data
+      stopifnot(is.numeric(vec),
+                all(is.element(levels(as.factor(vec)), c("0", "1"))))
+      
+      m <- length(vec)
+      ### Compute unfolding errors
+      errors <- 0
+      ones <- which(vec == 1)
+      nones <- length(ones)
+      if(nones >= 2) {
+            for(i in 1:(nones-1)) {
+                  for(j in (i+1):nones) {
+                        left <- ones[i]
+                        right <- ones[j]
+                        if(right - left == 1) next
+                        span <- vec[left:right]
+                        errors <- errors + length(span[span==0])
+                  }
+            }
+      }
+      return(errors)
+}
+### !!! <--- Function 8 ---> !!! ### (END)
+
+### !!! <--- Function 9 ---> !!! ### (START)
+################################################################
+### NUMERICALLY SIMULATE EXPECTED NUMBER OF UNFOLDING ERRORS ###
+################################################################
+numericalUnfoldingErrors <- function(vardiffs, nobs, n, seed) {
+      ### This function performs a numerical experiment simulating the distribution of unfolding errors in a dataset under an assumption of independence of variables given a vector of difficulty levels of these variables
+      ### It takes 4 arguments:
+      ###   - vardiffs: a vector of variables' difficulty levels
+      ###   - nobs: the number of observations in the simulated dataset
+      ###   - n: the number of simulated datasets
+      ###   - seed: seed for the pseudorandom numbers generator
+      
+      ### Check the input arguments
+      stopifnot(is.numeric(vardiffs),
+                is.numeric(nobs) & length(nobs) == 1,
+                is.numeric(n) & length(n) == 1)
+      
+      ### Make varnames
+      m <- length(vardiffs)
+      varnames <- vector(mode="character", length=m)
+      if(is.null(names(vardiffs))) {
+            varnames <- paste(as.character(1:m), "var", sep="")
+      }
+      else varnames <- names(vardiffs)
+      
+      ### Set seed
+      set.seed(seed)
+      
+      ### Inner helper function
+      ### It generates simulated data for one observation
+      makeSimRow <- function(vardiffs) {
+            m <- length(vardiffs)
+            simdata <- vector(mode="numeric", length=m)
+            rnums <- runif(m, 0, 1)
+            simdata[rnums <= vardiffs] <- 1
+            return(simdata)
+      }
+            
+      ### Conduct simulation
+      simerrors <- vector(mode="numeric", length=n)
+      for(iter in 1:n) {
+            cat(sprintf("ITERATION: %d\n", as.integer(iter)))
+            dat <- data.frame(matrix(0, nrow=nobs, ncol=m))
+            names(dat) <- varnames
+            for(row in 1:nobs) {
+                  #cat(sprintf("\trow: %d\n", as.integer(row)))
+                  dat[row, ] <- makeSimRow(vardiffs)
+            }
+            errors <- sum(apply(dat, 1, unfoldingErrors))
+            simerrors[iter] <- errors
+      }
+      return(simerrors)
+}
+### !!! <--- Function 9 ---> !!! ###
+
+### !!! <--- Function 10 ---> !!! ###
+###############################################
+### CHECK IF A VARIABLE IS NUMERICAL BINARY ###
+###############################################
+is.binary <- function(vec) {
+      ### Takes one argument:
+      ### vec: a vector of some type
+      out <- is.numeric(vec) & all(is.element(levels(as.factor(vec)), c("0", "1")))
+      return(out)
+}
+### !!! <--- Function 10 ---> !!! ###
+
+### !!! <--- Function 11 ---> !!! ###
+################################################
+### COMPUTE TRIPLET H IN THE UNFOLDING MODEL ###
+################################################
+unfoldingHijk <- function(dat) {
+      ### This function computes H correlation statistic for a triplet of items for the unfolding model
+      ### It takes 2 arguments:
+      ###   - dat: a data.frame with binary numerical variables
+      ###   - vars: a numerical vector of length 3 indicating indexes of the variables  in the data.frame
+      ### The function does not tolerate NAs
+      
+      ### Check the input data
+      stopifnot(is.data.frame(dat) & all(apply(dat, 2, is.binary)),
+                all(complete.cases(dat)))
+      
+      diffs <- apply(dat, 2, mean)
+      n <- dim(dat)[1]
+      ### Observed violations
+      Eobs <- sum(apply(dat, 1, unfoldingErrors))
+      cat(sprintf("E-obs --> %d\n", as.integer(Eobs)))
+      ### Expected violations under the null model
+      Eexp <- diffs[1]*(1-diffs[2])*diffs[3]*n
+      cat(sprintf("E-exp --> %f\n", Eexp))
+      Hijk <- 1 - (Eobs/Eexp)
+      cat(sprintf("Hijk --> %f\n", Hijk))
+      return(Hijk)
+}
+### !!! <--- Function 11 ---> !!! ###
+
+### !!! <--- Function 12 ---> !!! ###
+########################
+### COMPUTE ALL Hijk ###
+########################
+allUnfoldingHijk <- function(dat) {
+      ### This function computes all unfolding Hijk correlations in a dataset
+      ### It takes 1 argument:
+      ###   - dat: a data.frame with only binary numerical variables and no NAs
+      ### CAUTION!!! The function assumes that the variables are in a proper unfolding order
+      ### Check the input arguments
+      stopifnot(is.data.frame(dat), all(apply(dat, 2, is.binary)),
+                all(complete.cases(dat)))
+      
+      ### Compute the number of triplets
+      m <- dim(dat)[2]
+      triplets <- choose(m, 3)
+                        
+      ### Compute Hijk statistics
+      stats <- vector(mode="numeric", length=triplets)
+      statnames <- vector(mode="character", length=triplets)
+      counter <- 0
+      for(i in 1:(m-2)) {
+            for(j in (i+2):m) {
+                  for(k in (i+1):(j-1)) {
+                        counter <- counter + 1
+                        sname <- paste(c("H",i,j,k), collapse="_")
+                        statnames[counter] <- sname
+                        Hijk <- unfoldingHijk(dat[, c(i,k,j)])
+                        stats[counter] <- Hijk
+                  }
+            }
+      }
+      names(stats) <- statnames
+      return(stats)
+}
+### !!! <--- Function 12 ---> !!! ### (END)
+
+### !!! <--- Function 13 ---> !!! ### (END)
+#############################################
+### COMPUTE UNFOLDING H and Hi STATISTICS ###
+#############################################
+unfoldingH <- function(dat) {
+      ### Takes one argument:
+      ###   - dat: a data.frame of binary variables and proper unfolding item ordering
+      ### Check the input arguments
+      stopifnot(is.data.frame(dat), all(apply(dat, 2, is.binary)),
+                all(complete.cases(dat)))
+      
+      ### Compute H
+      n <- dim(dat)[1]
+      m <- dim(dat)[2]
+      triplets <- choose(m, 3)
+      His <- vector(mode="numeric", length=m)
+      nHis <- vector(mode="character", length=m)
+      Eexps <- vector(mode="numeric", length=triplets)
+      Eobs <- vector(mode="numeric", length=triplets)
+      nvec <- vector(mode="character", length=triplets)
+      counter <- 0
+      for(i in 1:(m-2)) {
+            for(j in (i+2):m) {
+                  for(k in (i+1):(j-1)) {
+                        counter <- counter + 1
+                        cdat <- dat[, c(i,k,j)]
+                        diffs <- apply(cdat, 2, mean)
+                        Eexp <- diffs[1]*(1-diffs[2])*diffs[3]*n
+                        Eexps[counter] <- Eexp
+                        Eob <- sum(apply(cdat, 1, unfoldingErrors))
+                        Eobs[counter] <- Eob
+                        name <- paste(c(i,k,j), collapse="_")
+                        nvec[counter] <- name
+                  }
+            }
+      }
+      for(i in 1:m) {
+            pattern <- paste("_?", paste(i, "_?", sep=""), sep="")
+            ids <- grep(pattern, nvec, perl=TRUE)
+            His[i] <- 1 - sum(Eobs[ids])/sum(Eexps[ids])
+            name <- paste("H", i, sep="_")
+            nHis[i] <- name
+      }
+      names(His) <- nHis
+      H <- 1 - sum(Eobs)/sum(Eexps)
+      L <- list(H, His)
+      names(L) <- c("H", "Hi")
+      return(L)
+}
+### !!! <--- Function 13 ---> !!! ###
+
+### !!! <--- Function 14 ---> !!! ### 
+#########################################################
+### PERFORM EASIEST ITEMS TEST OF THE UNFOLDING MODEL ###
+#########################################################
+EasiestItemsTest <- function(dat, ids) {
+      ### This function performs the easiest items test of the unidimensional unfolding scale models fit, as described by Van Schuur. First three subsets of respondents are found: 1) those with only 2 positives answers that are additionally alocated to two easiest items of the right pole of the unfolding scale; 2) those who allocated their 2 aswers to the two easiest items of the left pole of the scale; 3) and those who allocated their two answers to the easiest items of the both polar subscales of the unfolding scale. The it is tested whether positive answers in these groups are positively correlated. In a perect unfolding model positive answers should be independent in the first two groups and positively correlated in the third.
+      ### The function takes 2 arguments:
+      ###   - dat: a data.frame of binary variables in a proper unfolding model
+      ###   - ids: numeric vecotr of lenght 4 with ids of the four variables of interest; alternativel it may be a character vector of length 4 with their labels.
+      
+      ### Check the input arguments
+      stopifnot(is.data.frame(dat), all(apply(dat, 2, is.binary)),
+                length(ids) == 4 & (is.character(ids) | is.numeric(ids)))
+      
+      ### Perform the test
+      resp2 <- apply(dat, 1, sum) == 2
+      dat <- dat[resp2, ids]
+      n <- dim(dat)[1]
+      if(n < 20) {
+            cat(sprintf("N = %d\n", as.integer(n)))
+            stop(message="Too few respondents; N < 20")
+      }
+      tableft <- table(dat[, 1:2])
+      tabright <- table(dat[, 3:4])
+      tabmiddle <- table(dat[, 2:3])
+      ltest <- chisq.test(tableleft)
+      rtest <- chisq.test(tableright)
+      mtest <- chisq.test(tablemiddle)
+      leftout <- print(ltest)
+      rightout <- print(rtest)
+      middleout <- print(mtest)
+      L <- list(leftout, rightout, middleout)
+      names(L) <- c("Mokken Left", "Mokken Right", "Unfolding Middle")
+      return(L)
+}
+### !!! <--- Function 14 ---> !!! ### (END)
+
+### !!! <--- Function 15 ---> !!! ### (START)
+################################################################
+### COMPUTE BOOTSTRAP STANDARD ERRORS FOR UNFOLDING Hi and H ###
+################################################################
+unfoldingSE <- function(dat, n=100) {
+      ### The function comptues standard errors for unfolding Hi and H statistcs. Bootstrap is used due to the lack of analytical formula.
+      ### It takes 2 arguments:
+      ###   - dat: a data.frame of binary variables with a proper unfolding items ordering
+      ###   - n: the number of simulated datasets in the bootstrap procedure
+      
+      ### Check the input arguments
+      stopifnot(is.data.frame(dat), all(apply(dat, 2, is.binary)),
+                is.numeric(n) & length(n) == 1)
+
+      ### Compute standard errors
+      m <- dim(dat)[2]
+      nobs <- dim(dat)[1]
+      His <- paste("H", 1:m, sep="_")
+      Hvec <- vector(mode="numeric", length=n)
+      Himat <- matrix(0, nrow=n, ncol=m)
+      colnames(Himat) <- His
+      
+      ### Bootstrap loop
+      for(i in 1:n) {
+            cat(sprintf("ITERATION: %d\n", as.integer(i)))
+            ids <- sample.int(nobs, size=nobs, replace=TRUE)
+            bootdat <- dat[ids, ]
+            Hstats <- unfoldingH(bootdat)
+            Hvec[i] <- Hstats$H
+            Himat[i, ] <- Hstats$Hi
+      }
+      
+      Hse <- sd(Hvec)
+      Hise <- apply(Himat, 2, sd)
+      L <- list(Hse, Hise)
+      names(L) <- c("H_se", "Hi_se")
+      return(L)
+}
+### !!! <--- Function 15 ---> !!! ###
+
+### !!! <--- Function 16 ---> !!! ###
+###################################################################
+### COMPUTE CONDITIONAL ADJACENCY MATRIX FOR AN UNFOLDING MODEL ###
+###################################################################
+ufConditionalMat <- function(dat, round=2) {
+      ### The function takes 2 arguments:
+      ###   - dat: a data.frame with binary variables and a proper unfolding items orderings
+      ###   - round: a numerical vector of length 1 indicating how long decimal expansion in the output should be
+      
+      ### Check the input data
+      stopifnot(is.data.frame(dat) & all(apply(dat, 2, is.binary)))
+      
+      ### Generate the condtitional adjacency matrix
+      m <- dim(dat)[2]
+      CondMat <- matrix(0, nrow=m, ncol=m)
+      rownames(CondMat) <- names(dat)
+      colnames(CondMat) <- paste("|", names(dat), sep="")
+      for(i in 1:m) {
+            for(j in 1:m) {
+                  if(i == j) {
+                        CondMat[i, j] <- NA
+                        #cat(sprintf("%d == %d --> NA\n",
+                        #            as.integer(i), as.integer(j)))
+                  }
+                  else {
+                        cdat <- dat[dat[, j] == 1, i]
+                        ctab <- table(cdat)
+                        cprob <- 0
+                        if(length(ctab) == 2) {
+                              cprob <- prop.table(ctab)[2]
+                        }
+                        CondMat[i, j] <- cprob
+                        #cat(sprintf("%d != %d --> %f\n", 
+                        #            as.integer(i), as.integer(j), cprob))
+                  }
+            }
+      }
+      return(round(CondMat, round))
+}
+### !!! <--- Function 16 ---> !!! ### (END)
