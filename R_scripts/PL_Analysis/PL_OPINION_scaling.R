@@ -46,7 +46,7 @@ fmca2 <- mjca(data.lim1, nd=NA, lambda="adjusted")
 
 ### Create new scales of liberalism and socialism
 ### First we derive datasets with answers mapped to the scales' answers
-map <- read.table(normalizePath("./Data/Maps/PL_to_liberal_map.csv"),
+map <- read.table(normalizePath("./Data/Maps/LibSoc_map.csv"),
                   sep=";", row.names=1, header=TRUE)
 libdat <- mapOPINION(data.lim1, map, country="PL", verbose=TRUE, liberal=TRUE)
 socdat <- mapOPINION(data.lim1, map, country="PL", verbose=TRUE, liberal=FALSE)
