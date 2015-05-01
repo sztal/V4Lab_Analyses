@@ -221,6 +221,7 @@ ufdat <- ufdat[, grep("s19", names(ufdat), invert=TRUE, fixed=TRUE)]
 ### Scallability coefficients for items and the scale
 ufCoefs <- unfoldingH(ufdat) ### Now coefficients are very good
 ### Now we compute standard errors of these coefficients using bootstrap
+set.seed=500 # set seed for the pseudorandom numbers genererator (for bootstrap)
 ufSE <- unfoldingSE(ufdat, n=100)
 ### 95% CI for the H is: [0.42-0.54]
 ### Check of the ordinal specific objectivity (formal unfolding property)
@@ -236,3 +237,88 @@ ufRel <- (8*libRel + 6*socRel) / 14
 ### So the Cronbach's Alpha is about 0.72. Not very much, but enough to consider a scale satisfactory
 
 ### We conclude that the data conforms to the unidimensional in terms of scaling but it does not possess some of the formal properties of an unidimensional unfolding scale
+
+##########################################################
+### PREPARE THE DATASET OBJECT WITH THE OPINION SCALES ###
+##########################################################
+
+### Compute the unfolding scores using the Van Schuur counting method
+data.backup <- data
+data <- dat_pl1
+libsoc <- vector(mode="numeric", length=dim(data)[1])
+libsoc[data$opinionIV == 0] <- apply(ufdat, 1, unfoldingScore) - 16
+### We shift the scale to the midpoint (a person that gave positive answers only to the easiest items from both subscales)
+libsoc[data$opinionIV == 1] <- NA
+data$libsoc <- libsoc
+
+### We compute the score using also the Van der Bruug approach
+wlibsoc <- vector(mode="numeric", length=dim(data)[1])
+wlibsoc[data$opinionIV == 0] <- apply(ufdat, 1, unfoldingScore, TRUE) - 8.5
+wlibsoc[data$opinionIV == 1] <- NA
+data$wlibsoc <- wlibsoc
+### Again the scale is shifted to the midpoint (defined in the same manner as before)
+
+### Check the distributions of both variables
+histogram(~libsoc + wlibsoc, data=data, par.settings=V4bgw,
+          xlab="Liberalism-Socialism", ylab="Percent of Total",
+          strip=strip.custom(factor.levels=c("Van Schuur score", "Van der Brug score")),
+          layout=c(1, 2))
+### Numerical summary
+summary(data[, c("libsoc", "wlibsoc")])
+
+### Correlation between the two scales
+cor(data[, c("libsoc", "wlibsoc")], use="pair") ### almost the same
+
+### Save the subscale (liberalism and socialism)
+liberalism <- vector(mode="numeric", length=dim(data)[1])
+liberalism[data$opinionIV == 0] <- ldat$lib
+liberalism[data$opinionIV == 1] <- NA
+data$liberalism <- liberalism
+
+socialism <- vector(mode="numeric", length=dim(data)[1])
+socialism[data$opinionIV == 0] <- sdat$soc
+socialism[data$opinionIV == 1] <- NA
+data$socialism <- socialism
+
+#####################
+### SAVE THE DATA ###
+#####################
+
+dat_pl2 <- data
+### save as .txt file
+### field separator is set to "\t"
+write.table(dat_pl2, sep="\t", row.names=TRUE,
+            file=normalizePath("./Data/MainData/dat_PL2.txt"))
+### Save as an R data object
+save(dat_pl2, file=normalizePath("./Data/MainData/dat_PL2.RData"))
+
+### Clean the workspace 
+### (optional: uncomment to remove all objects from RStudio working memory)
+# rm(list = ls())
+
+### !!! <--- END OF SCRIPT ---> !!! ###
+
+### Session info
+# sessionInfo()
+#
+# R version 3.2.0 (2015-04-16)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: Ubuntu 14.04.2 LTS
+# 
+# locale:
+#       [1] LC_CTYPE=pl_PL.UTF-8       LC_NUMERIC=C               LC_TIME=pl_PL.UTF-8       
+# [4] LC_COLLATE=pl_PL.UTF-8     LC_MONETARY=pl_PL.UTF-8    LC_MESSAGES=pl_PL.UTF-8   
+# [7] LC_PAPER=pl_PL.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+# [10] LC_TELEPHONE=C             LC_MEASUREMENT=pl_PL.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+#       [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+#       [1] ca_0.58              doBy_4.5-13          survival_2.38-1      knitr_1.10          
+# [5] mokken_2.7.7         poLCA_1.4.1          MASS_7.3-39          scatterplot3d_0.3-35
+# [9] reshape2_1.4.1       latticeExtra_0.6-26  lattice_0.20-31      RColorBrewer_1.1-2  
+# 
+# loaded via a namespace (and not attached):
+#       [1] Rcpp_0.11.5   grid_3.2.0    plyr_1.8.1    Matrix_1.2-0  splines_3.2.0 tools_3.2.0  
+[7] stringr_0.6.2
