@@ -78,7 +78,7 @@ which(data$year_at_uni == "PHD")
 data_cz_select <- data
 ### Save as a .txt file
 ### field separator is set to "\t"
-write.table(data_cz_select, sep = "\t", row.names = FALSE,
+write.table(data_cz_select, sep = "\t", row.names = TRUE,
             file = normalizePath("./Data/MainData/CZ_selected.txt"))
 ### Save as an R data object
 save(data_cz_select, file = normalizePath("./Data/MainData/CZ_selected.RData"))

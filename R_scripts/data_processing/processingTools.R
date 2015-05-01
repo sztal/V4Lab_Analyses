@@ -709,3 +709,50 @@ ufConditionalMat <- function(dat, round=2) {
       return(round(CondMat, round))
 }
 ### !!! <--- Function 16 ---> !!! ### (END)
+
+### !!! <--- Function 17 ---> !!! ### (START)
+###############################################
+### COMPUTE UNIDIMENSIONAL UNFOLDING SCORES ###
+###############################################
+unfoldingScore <- function(vec, weighted=FALSE) {
+      ### This function computes unfolding scale scores using Van Schuur or Van der Bruug approach
+      ### It takes 2 arguments:
+      ###   - vec: a binary vector of data with proper unfolding ordering
+      ###   - weighted: logical flag indicating whether weighted approach of Van der Bruug should be used. If false then standard approach of Van Schuur is used
+      
+      ### Check the input data
+      stopifnot(is.numeric(vec) | is.data.frame(vec) & dim(vec)[1] == 1,
+                is.binary(as.numeric(vec)),
+                is.logical(weighted) & length(weighted) == 1)
+      
+      vec <- as.numeric(vec)
+      ### Van Schuur approach
+      if(!weighted) {
+            score <- 0
+            if(sum(vec) == 0) {
+                  score <- NA
+                  return(score)
+            }
+            ones <- which(vec == 1)
+            firstOne <- ones[1]
+            lastOne <- 0
+            if(length(ones) == 1) {
+                  leftzeros <- length(vec[1:firstOne]) - 1
+                  score = score + 1 + leftzeros*2
+            }
+            else {
+                  lastOne <- ones[length(ones)]
+                  leftzeros <- length(vec[1:firstOne]) - 1
+                  inzeros <- setdiff(firstOne:lastOne, ones)
+                  score <- score + length(ones) + 2*leftzeros
+                  for(zero in inzeros) {
+                        if(mean(zero > ones) == .5) score <- score + 1
+                        else if(mean(zero > ones) < .5) score <- score + 2
+                  }
+            }
+      }
+      else {
+            score <- sum(vec*(1:length(vec))) / sum(vec)
+      }
+      return(score)
+}
