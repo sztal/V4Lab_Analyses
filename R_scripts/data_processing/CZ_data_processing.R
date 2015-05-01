@@ -21,8 +21,8 @@ for(col in grep("^p[0-9]+", enc2utf8(names(data)), perl = TRUE)) {
       data[, col] <- as.character(data[, col])
       data[, col] <- as.numeric(data[, col]) ### to get rid of non-numerical values
       data[, col] <- as.character(data[, col]) 
-      data[, col][data[, col] == "1"] <- "Agree"
-      data[, col][data[, col] == "2"] <- "Disagree"
+      data[, col][data[, col] == "1"] <- "Disagree"
+      data[, col][data[, col] == "2"] <- "Agree"
       data[, col][data[, col] == "3"] <- "DontKnow"
       data[, col] <- factor(data[, col],
                             levels = c("Agree", "Disagree", "DontKnow"))
