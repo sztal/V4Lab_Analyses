@@ -300,7 +300,8 @@ mapOPINION <- function(data, map, country, liberal, verbose=FALSE) {
       ### IMPORTANT! This function should be used only on data with no non-ASCII characters
       
       ### Check whether the input data is OK
-      stopifnot(is.data.frame(data), is.data.frame(map), dim(map)[2] == 4,
+      stopifnot(is.data.frame(data), is.data.frame(map), 
+                dim(map)[2] == 4 | dim(map)[2] == 2,
                 any(grepl("PL", names(map), perl = TRUE, ignore.case = TRUE)) | any(grepl("CZ", names(map), perl = TRUE, ignore.case = TRUE)),
                 is.character(country) & length(country) == 1,
                 is.logical(verbose) & length(verbose) == 1,
