@@ -757,3 +757,36 @@ unfoldingScore <- function(vec, weighted=FALSE) {
       }
       return(score)
 }
+### !!! <--- Function 17 ---> !!! ### (END)
+
+### !!! <--- Function 18 ---> !!! ### (START)
+###########################################
+### COMPUTE NON-GUESSED KNOWLEDGE SCORE ###
+###########################################
+nonguessedKnowScore <- function(vec) {
+      ### This function computes non-guesses KNOWLEDGE scores based on an assumption that (in regard to true/false questions) respondents guess the correct answer if they do not know it
+      ### It takes one argument:
+      ###   - vec: binary numerical vector
+      ### CAUTION! In presence of one or more NA's the function returns NA
+      
+      vec <- as.numeric(vec)
+      ### Check the input data
+      stopifnot(is.binary(vec), is.numeric(vec),
+                is.data.frame(vec) & nrow(vec) == 1)
+      
+      ### Compute the score
+      if(sum(is.na(vec)) > 0) return(NA)
+      else {
+            if(length(vec) == 1) return(vec[1])
+            else {
+                  m <- length(vec)
+                  expsc <- m / 2
+                  raw <- sum(vec)
+                  plusmin <- raw - expsc
+                  guessed <- expsc - plusmin + 1
+                  ngscore <- raw - guessed
+            }
+      }
+      return(ngscore)
+}
+### !!! <--- FUnction 18 ---> !!! ### (END)
