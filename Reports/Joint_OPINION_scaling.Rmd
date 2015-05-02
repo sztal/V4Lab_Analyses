@@ -1,0 +1,202 @@
+---
+title: "Joint OPINION scaling"
+author: "Szymon Talaga"
+date: "02.05.2015"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+# Reference list
+In this report we refere to the following works of other authors:
+
+* [1] Van Schuur, W. H. (1998). From Mokken to MUDFOLD and back. *In Search of Structure. Essays in Social Science and Methodology*, 45-62.
+* [2] Van Schuur, W. H. (2003). Mokken scale analysis: Between the Guttman scale and parametric item response theory. *Political Analysis*, 11(2), 139-163.
+* [3] Van der Ark, L. A. (2007). Mokken scale analysis in R. *Journal of Statistical Software*, 20(11), 1-19.
+* [4] Van der Ark, L. A. (2012). New developments in Mokken scale analysis in R. *Journal of Statistical Software*, 48(5), 1-27.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+### Load additional packages and helper functions
+source(normalizePath("./../R_scripts//data_processing/processingTools.R"))
+source(normalizePath("./../R_scripts//Visualization/Themes//LatticeThemes.R"))
+library(RColorBrewer)
+library(lattice)
+library(latticeExtra)
+library(reshape2)
+library(poLCA)
+library(scatterplot3d)
+library(MASS)
+library(mokken)
+library(knitr)
+library(survival)
+library(doBy)
+library(ca)
+library(psych)
+### Load V4 color theme
+V4bgw <- V4themes("standard_bgw")
+```
+
+# Introduction
+In this report we describe the scaling procedure that was used to construct a formal scale consisting of items belonging to the OPINION items set. The aim was to uncover a formal scale corresponding to the dimension of economic viewpoints that for our purposes may be called liberal-socialist attitude dimension (liberalism is generally understood here as sympathy for a limited state control over the economy and low level of etatism and public welfare programs; socialism is understood as preference for high levels of the state interventionism and etatism as well as broad, well-developed public welfare programs).
+
+Since the liberalism-socialism scale we look for is bipolar, then it is clear that we have to look for a preferential scale as opposed to a cumulative scale. Preferential scales assume that respondents have some "area of comfort", that is they are willing to choose (answer positively) items that are close enough to their viewpoints and opinions and not to choose items that are too extreme in a sense that they are either too weak or too strong. Cumulative scales assume that the phenomenon of interest is cumulative, that is respondents with some level of e.g. a trait or ability that is measured generally should give correct answers to items that are "easy" or "weak" enough for them and not answer correctly items that are too "hard" or "strong". Knowledge tests are a good example of a cumulative scale (people usually answer correctly all questions that are easy enough for them to solve and do not answer correctly those that are too hard).
+
+Our search for the liberalism-socialism preferential scale is based on an assumption that it may be partitioned into cumulative subscales of liberalism and socialism. Therefore we start with finding these two subscales which then will be joined to form one scale. This approach will not yield a perfect unidimensional preferential scale, since it will rather yield two scales glued back-to-back. Nevertheless such a scale will emulate an unidimensional scale well enough for our purposes and may be used as a good starting point for a construction of a truly unidimensional preferential scale in further research projects.
+
+We use nonparametric Mokken scale technique to construct the subscales. Elaborate description of it may be found in: [2, 3, 4]. For now it is enough to say that this technique provides correct ordinal measurement of a trait in the following sense:
+
+* Sum of the correct answers to questions is a sufficient estimator of a trait
+* Fraction of correct answers to a question is a sufficient estimator of this question intensity in regard to the measured phenomenon
+* Respondents may be ordered according to their scale scores; in other words it is ensured that those who answered 3 questions correctly have higher level of the trait than those who gave correct answers to only 2 questions etc.
+* Questions' ordering by difficulty is the same for all respondents
+
+For a Mokken scale to have this properties it must possess two other properties in the first place. These properties are monotonous homogeneity and double monotonicity (see: [1] for an elaborate description). We will test whether this is true in the case of our (sub)scales.
+
+Once we establish the subscales they will be composed into one bipolar scale of liberalism-socialism. For this purpose we will use the Multiple Unidimensional Unfolding Model (MUDFOLD) [1]. However, as it was stated before, this scale will only emulate a truly unidimensional preferential scale, since it will not be formaly ensured that it possesses the same 4 measurement properties as the cumulative subscales. Nevertheless since the subscales will do possess them, such a scale should be good enough for the preliminary small-scale research project such as this, as its main rationale is to provide a basis for further development of good measurement tools for studying students' opinions.
+
+# Construction of the cumulative subscales
+First we determined which questions from the OPINION items set (see the Codebook and/or README) should not be included in the scales due to the lack of correspondence to the liberalism-socialism dimensions. This was done by means of a qualitative semantic analysis of the items' contents and Multiple Correspondence Analysis (not shown here; see the "Join_OPINION_scaling.R" script). As a result the following items have been removed: o15, o17 and o23.
+
+We used the same approach (qualitative analysis + MCA) to determine which answers ('Agree's or 'Disagree's) are 'diagnostic' for liberalism and socialism scales. The outcome of this analysis may be found in the "Joint_OPINION_map.csv" file. Then we created two datasets one binary (0/1) variables for each OPINION item (except for those removed), in which respondents answers were mapped to 0's or 1's accordingly to whether the answers given were 'diagnostic' either for liberalism scale or socialism scale or not. So one of the datasets stores information about 'diagnostic' answers in regard to the liberalism scale and the other in regard to the socialism scale. It should be noted that corresponding variables in this datasets are correlated (since if a respondent gave a positive answer to a question in terms of the liberalism scale it must have had given a nonpositive answer in terms of the socialism scale; however despite of that respondents could still give nonpositive answers in regard to both scales because of the 'Don't Know' answer option). For now we will call this datasets 'liberalism dataset' and 'socialism dataset'.
+
+Data in the liberalism dataset was of course used to construct the liberalism subscale and data in the socialism dataset to make the socialism subscale. In order to find items forming good scales an inductive genetic algorithm based technique that adds items one by one to find a good scale [4] was used. Once proper items were found they were tested in regard to their scaling properties and Mokken Scale assumptions (monotonous homogeneity and double monotonicity).
+
+We also made efforts to obtain (even at the expense of scaling properties) scales of the same length and made with non-overlapping items. Later on it allowed us to construct a symmetric preferential scale consisting of items that are not structurally correlated (what would be the case if the items were ovelapping, since both liberalism and socialism binary variables indicating 'diagnostic' responses were derived from the same data).
+
+```{r, echo=FALSE}
+load(normalizePath("./OPINION_scaling_workspace_image.RData"))
+```
+
+## Liberalism subscale
+Liberalism subscale consists of four items: **l14**, **l11**, **l13**, **l19**. It conforms to Mokken scale model assumptions of monotonous homogeneity and double monotonicity.
+
+Monotonous homogeneity was tested using the *check.monotonicity* method implemented in R programming language in the '*mokken*' package [3, 4]. From the values in the table below the most important are:
+
+* **#zsig** - number of statistically significant violations of monotonous homogeneity assumption
+* **crit** - statistic indicating the general level of the model violation in a given item.
+
+```{r, echo=FALSE}
+summary(libmono)
+```
+
+Clearly there are no violations of the assumption of monotonous homogeneity.
+
+Double monotonicity assumption was tested using the *check.restscore* method of the '*mokken*' package. In this case there was no violations as well.
+
+```{r, echo=FALSE}
+summary(librest)
+```
+
+Therefore the items form a proper Mokken scale.
+
+*H* coefficients of homogeneity (so called Loevinger correlation coefficients) indicate how good a scale or items are in regard to expected cumulative character of the scale (again, elaborate description in [2, 3, 4]). A general rule of thumb says that values above 0.3 are satsifactory, above 0.4 good and above 0.5 very good (*Hi* refer to *H* coefficients for the items and *H* is the global scaling coefficient of the scale).
+
+```{r, echo=FALSE}
+libH$Hi
+libH$H
+```
+
+Normal 95% confidence interval for the global *H* is: [0.304 - 0.457], what implies that the scale can be considered good. However the estimated lower bound for its reliability (Cronbach's $\alpha$) is very low (for reasons not entirely clear to use, since the scaling coefficients are good): $\alpha = 0.48$. This is for sure its weakest point, but all other properties suggest that the scale is rather good. Thus we leave it as it is despite of potentially high measurement error.
+
+The distribution of the scale scores is right skewed what implies that the scale may not discriminate well between respondents of weak liberal attitude. Below we present also a numerical summary of the distribution.
+
+```{r, echo=FALSE, fig.width=4, fig.height=4}
+histogram(~lib, par.settings=V4bgw, xlab="Liberalism Scale Score", 
+          ylab="Percent of Total", breaks=c(0:4))
+summary(lib)
+```
+
+In order to ensure that the scale is theoretically valid at a basic level correlations with the leseferism-etatism axis and the matrix of social and economic viewpoints (see the Codebook) were examined.
+
+```{r, echo=FALSE}
+corr.test(ldat[, grep("les.*eta|mat_|lib", names(ldat), perl=TRUE)])
+```
+
+The correlations are congruent with the expectations, since the scale scores correlate negatively with the leseferism-etatism axis and positively with declared liberal economic viewpoint.
+
+## Socialism subscale
+The goodness-of-fit of the socialism scale was examined with the same methods as the liberalism scale.
+
+The scale consists of four items: **s7**, **s4**, **s20**, **s21**.
+
+It conforms to monotonous homogeneity assumption:
+
+```{r, echo=FALSE}
+summary(socmono)
+```
+
+And to double monotonicity assumption:
+
+```{r, echo=FALSE}
+summary(socrest)
+```
+
+The *H* scaling coefficients are good as well. 95% normal confidence interval for the global *H* is: [0.360 - 0.501].
+
+```{r}
+socH$Hi
+socH$H
+```
+
+Reliability of the scale in this case is also surprisingly low despite the good other scaling properties: $\alpha = 0.57$.
+
+Distribution of this scale is also right-skewed, so respondents of weakly socialist attitudes may not be appropriately identified.
+
+```{r, echo=FALSE, fig.width=4, fig.height=4}
+histogram(~soc, par.settings=V4bgw, xlab="Socialism Scale Score",
+          ylab="Percent of Total", breaks=0:4)
+summary(soc)
+```
+
+Theoretical validity of the socialism scale is also satisfactory. Correlations are of similar magnitude but reversed in comparison to the liberalism scale.
+
+```{r, echo=FALSE}
+corr.test(sdat[, grep("les.*eta|mat_|soc", names(sdat), perl=TRUE)])
+```
+
+# Construction of the preferential Liberalism-Socialism scale
+Now we use the subscales to build the preferential Liberalism-Socialism scale.
+
+Again, *H* coefficients measure scaling quality of the items and the entire scale (thumb rule is the same as before: *H* > 0.3 is acceptable; *H* > 0.4 is good and *H* > 0.5 is very good).
+
+The *H* coefficients suggest that the scale is good. 95% normal confidence interval for the global *H* is: [0.333 - 0.474].
+
+```{r, echo=FALSE}
+ufCoefs
+```
+
+Lower bound for the reliability of the scale is clearly better in this scale, although it is still barely satisfactory: $\alpha = 0.60$ (95% CI: [0.55 - 0.66]).
+
+Therefore we conclude that the scale conforms to the unidimensional unfolding model in terms of scaling quality but, as it was mentioned before, it does not guarantee formal properties of correct ordinal measurement (as the cumulative Mokken subscales do). However, both subscales do ensure these properties. However, this - together with the fact that theoretically speaking economic liberalism should be the opposite of the economic socialism/etatism - give good reasons to believe that the preferential scale we constructed allows measurement of economic liberal-socialist attitudes that is accurate enough for our purposes, that is mainly group comparisons between the Czech and Polish samples and other groups (i.e. types of university education).
+
+Moreover the distirbution of the the scale scores implies good discriminatory potential of the scale since it is nicely symmetric.
+
+```{r, echo=FALSE, fig.width=4, fig.height=4}
+histogram(~libsoc, data=fulldat, par.settings=V4bgw,
+          xlab="Liberalism-Socialism score", ylab="Percent of Total",
+          breaks=-7:7)
+summary(fulldat$libsoc)
+```
+
+Basic theoretical validity of the scale is also ensured what is implied by the correct pattern of correlations with the leseferism-etatism axis and the matrix of social-economic viewpoints.
+
+```{r, echo=FALSE}
+corr.test(fulldat[, grep("libsoc|les.*etat|mat", names(fulldat), perl=TRUE)])
+```
+
+# Validation
+The last part of this report describes the scale validation procedure.
+
+In order to validate the scale we checked its scaling quality in the Polish and Czech parts of the sample.
+
+The analysis showed that the scale has even better quality in the Polish sample:
+
+```{r, echo=FALSE}
+ufCoefspl
+```
+
+However, the scale behaves much more badly in the Czech sample in which it is barely acceptable. Some items have very low scaling coefficients. However, there is nothing that can be done at this point about it, since it results mostly from the problems with cultural adaptation of the items. Therefore results for the Czech sample should be treated particularily cautiously. However, results for the Polish sample may be considered much more reliable.
+
+```{r, echo=FALSE}
+ufCoefscz
+```

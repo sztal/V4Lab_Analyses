@@ -112,7 +112,7 @@ librel <- check.reliability(ldat)
 ### Distribution of the scale scores
 lib <- apply(ldat, 1, sum)
 histogram(~lib, par.settings=V4bgw, xlab="Liberalism Scale Score", 
-          ylab="Percent of Total", breaks=c(-1:4))
+          ylab="Percent of Total", breaks=c(0:4))
 ### Not exactly symmetric (people of low liberalism may be hard to distinguish)
 
 ### Basic check of the thoretical validity
@@ -143,7 +143,7 @@ socrel <- check.reliability(sdat)
 ### Distribution of the scale scores
 soc <- apply(sdat, 1, sum)
 histogram(~soc, par.settings=V4bgw, xlab="Socialism Scale Score",
-          ylab="Percent of Total", breaks=-1:4)
+          ylab="Percent of Total", breaks=0:4)
 ### Not exactly symmetric, but quite
 
 ### Basic check of the thoretical validity
@@ -224,12 +224,35 @@ libsoc <- vector(mode="numeric", length=nrow(fulldat))
 libsoc[] <- NA
 names(libsoc) <- rownames(fulldat)
 libsoc[rownames(ufdat)] <- apply(ufdat, 1, unfoldingScore)
-fulldat$libsoc <- libsoc
+fulldat$libsoc <- libsoc - 8
 histogram(~libsoc, data=fulldat, par.settings=V4bgw,
           xlab="Liberalism-Socialism score", ylab="Percent of Total",
-          breaks=0:15)
+          breaks=1:15)
 ### Numerical summary
 summary(fulldat$libsoc)
+
+### Correlations with the leseferism-etatism axis and the social-economic viewpoints matrix
+corr.test(fulldat[, grep("libsoc|les.*etat|mat", names(fulldat), perl=TRUE)])
+### Correlations are significant and congruent with the expectations
+
+### Save the liberalism and socialism subscales as well
+liberalism <- vector(mode="numeric", length=nrow(fulldat))
+liberalism[] <- NA
+names(liberalism) <- rownames(fulldat)
+liberalism[rownames(ufdat)] <- apply(ldat[, 1:4], 1, sum)
+fulldat$liberalism <- liberalism 
+### We shift the scale for 0 to represent respondents in the middle (more precisely those respondents who gave 'diagnostic' answers only to the easiest items of the liberalism and socialism scales)
+
+socialism <- vector(mode="numeric", length=nrow(fulldat))
+socialism[] <- NA
+names(socialism) <- rownames(fulldat)
+socialism[rownames(ufdat)] <- apply(sdat[, 1:4], 1, sum)
+fulldat$socialism <- socialism
+
+### SAVE THE FULL DATASET
+write.table(fulldat, sep="\t", row.names=TRUE,
+            file=normalizePath("./Data/MainData/fulldat.txt"))
+save(fulldat, file=normalizePath("./Data/MainData/fulldat.RData"))
 
 ### Now the scale has to be validiated in both PL and CZ sample
 
@@ -264,3 +287,36 @@ CondMatcz <- ufConditionalMat(ufdatcz)
 
 # Reliability
 alpha(ufdatcz) # alpha of 0.54; poor
+
+### Clean the workspace 
+### (optional: uncomment to remove all objects from RStudio working memory)
+# rm(list = ls())
+
+### !!! <--- END OF SCRIPT ---> !!! ###
+
+### Session info
+# sessionInfo()
+# 
+# R version 3.2.0 (2015-04-16)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: Ubuntu 14.04.2 LTS
+# 
+# locale:
+#       [1] LC_CTYPE=pl_PL.UTF-8       LC_NUMERIC=C               LC_TIME=pl_PL.UTF-8       
+# [4] LC_COLLATE=pl_PL.UTF-8     LC_MONETARY=pl_PL.UTF-8    LC_MESSAGES=pl_PL.UTF-8   
+# [7] LC_PAPER=pl_PL.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+# [10] LC_TELEPHONE=C             LC_MEASUREMENT=pl_PL.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+#       [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+#       [1] psych_1.5.4          ca_0.58              doBy_4.5-13          survival_2.38-1     
+# [5] knitr_1.10           mokken_2.7.7         poLCA_1.4.1          MASS_7.3-39         
+# [9] scatterplot3d_0.3-35 reshape2_1.4.1       latticeExtra_0.6-26  lattice_0.20-31     
+# [13] RColorBrewer_1.1-2  
+# 
+# loaded via a namespace (and not attached):
+#       [1] Rcpp_0.11.5     splines_3.2.0   mnormt_1.5-2    stringr_0.6.2   plyr_1.8.1     
+# [6] tools_3.2.0     parallel_3.2.0  grid_3.2.0      htmltools_0.2.6 yaml_2.1.13    
+# [11] digest_0.6.8    Matrix_1.2-0    rmarkdown_0.5.1
