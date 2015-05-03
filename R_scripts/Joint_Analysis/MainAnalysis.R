@@ -10,8 +10,11 @@ source(normalizePath("./R_scripts//Visualization/Themes/LatticeThemes.R"))
 data <- fulldat
 
 ### Load packages
+library(RColorBrewer)
 library(lattice)
 library(latticeExtra)
+library(survival)
+library(car)
 library(doBy)
 library(effsize)
 library(heplots)
@@ -23,6 +26,21 @@ library(TH.data)
 library(multcomp)
 ### Load V4 color theme
 V4bgw <- V4themes("standard_bgw")
+
+#########################################
+### Description of the main variables ###
+#########################################
+
+summary(data[, c("libsoc", "ngknow", "knowraw")])
+lapply(data[, c("libsoc", "ngknow", "knowraw")], quantile, na.rm=TRUE,
+       probs=seq(0, 1, .1))
+
+### By country
+lapply(data[, c("libsoc", "ngknow", "knowraw")],
+       function(x) tapply(x, data$country, summary))
+lapply(data[, c("libsoc", "ngknow", "knowraw")],
+       function(x) tapply(x, data$country, quantile, na.rm=TRUE, probs=seq(0, 1, .1)))
+
 
 ### Basic comaprisons of PL and CZ samples
 ########################################
