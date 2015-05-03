@@ -249,6 +249,18 @@ names(socialism) <- rownames(fulldat)
 socialism[rownames(ufdat)] <- apply(sdat[, 1:4], 1, sum)
 fulldat$socialism <- socialism
 
+### Save raw numbers of liberal and socialist diagnostic answer for all items
+rawlib <- vector(mode="numeric", length=nrow(fulldat))
+rawsoc <- vector(mode="numeric", length=nrow(fulldat))
+rawlib[] <- NA
+rawsoc[] <- NA
+names(rawlib) <- rownames(fulldat)
+names(rawsoc) <- rownames(fulldat)
+rawlib[rownames(libdat)] <- apply(libdat, 1, sum)
+rawsoc[rownames(socdat)] <- apply(socdat, 1, sum)
+fulldat$rawlib <- rawlib
+fulldat$rawsoc <- rawsoc
+
 ### SAVE THE FULL DATASET
 write.table(fulldat, sep="\t", row.names=TRUE,
             file=normalizePath("./Data/MainData/fulldat.txt"))
