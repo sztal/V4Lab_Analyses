@@ -40,22 +40,12 @@ fulldat$father_edu <- recodeVar(fulldat$father_edu,
                                 tgt=rep("<=vocational", 3))
 fulldat$father_edu<- factor(fulldat$father_edu, 
                                      levels(fulldat$father_edu)[c(4,2,1,3)])
-fulldat$father_edu <- recodeVar(fulldat$father_edu,
-                                src=c("PHD+", "higher_edu"),
-                                tgt=rep("higher_edu+", 2))
-fulldat$father_edu<- factor(fulldat$father_edu, 
-                            levels(fulldat$father_edu)[c(3,2,1)], ordered=TRUE)
 
 fulldat$mother_edu <- recodeVar(fulldat$mother_edu,
                                 src=c("<primary", "primary", "vocational"),
                                 tgt=rep("<=vocational", 3))
 fulldat$mother_edu<- factor(fulldat$mother_edu, 
                             levels(fulldat$mother_edu)[c(4,2,1,3)])
-fulldat$mother_edu <- recodeVar(fulldat$mother_edu,
-                                src=c("PHD+", "higher_edu"),
-                                tgt=rep("higher_edu+", 2))
-fulldat$mother_edu<- factor(fulldat$mother_edu, 
-                            levels(fulldat$mother_edu)[c(3,2,1)], ordered=TRUE)
 
 ### Make ordinal joint parental education indicator
 fint <- as.numeric(fulldat$father_edu) - 1
