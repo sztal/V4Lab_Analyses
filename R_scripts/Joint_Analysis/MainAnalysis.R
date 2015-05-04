@@ -399,7 +399,7 @@ xyplot(ngknow ~ libsoc | eduprog3, data=data, par.settings=V4bgw,
 ### Liberalism-Socialism vs. WORK EXPERIENCE ###
 ################################################
 summaryBy(libsoc + liberalism + socialism + rawlib + rawsoc ~ work_experience, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
 useOuterStrips(histogram(~libsoc+liberalism+socialism+rawlib+rawsoc | work_experience,
                          data=data, par.settings=V4bgw, layout=c(7,5), 
                          xlab="Liberalism-Socialism scale", ylab="Percent of Total", 
@@ -439,7 +439,7 @@ anova(lm(libsoc ~ wexp * country, data=data)) # No interaction effect
 ### KNOWLEDGE SCORES vs. WORK EXPERIENCE ###
 ############################################
 summaryBy(ngknow + knowraw ~ wexp, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
 ### Anovas
 lapply(data[, c("ngknow", "knowraw")],
        function(x) summary(lm(x ~ data$wexp)))
@@ -460,6 +460,154 @@ contrasts(data$work_experience) <- contr.treatment(3)
 bwplot(ngknow ~ work_experience, data=data, ylab="Non-guessed KNOWLEDGE Scores",
        xlab="Work Experience", horizontal=FALSE,
        par.settings=V4bgw)
+
+### Controling for country
+bwplot(ngknow ~ work_experience | country, data=data, par.settings=V4bgw,
+       ylab="Non-guessed KNOWLEDGE Scores", xlab="Work Experience", horizontal=FALSE,
+       layout=c(2, 1))
+anova(lm(ngknow ~ wexp * country, data=data)) # Interaction very close to significance
+
+### Liberalism-Socialism and knowledge scores and study year
+### First we create numerical variable indicating study year
+data$uniyear <- as.numeric(data$year_at_uni)
+
+### Correlations
+corr.test(data[, c("libsoc", "ngknow", "uniyear")])
+xyplot(ngknow ~ uniyear, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(1,1), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.85, pos=3)
+       })
+summary(lm(ngknow ~ uniyear, data=data))
+### Relationship is significant
+
+### Controling for type of education
+### Interaction effect
+anova(lm(ngknow ~ uniyear*eduprog3, data=data)) # no significant interaction
+xyplot(ngknow ~ uniyear | eduprog3, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(1,3), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.85, pos=3)
+       })
+
+### Controling for type of education and country
+anova(lm(ngknow ~ uniyear*eduprog3*country, data=data))
+### Now we have an interaction between uniyear, country and type of education
+xyplot(ngknow ~ uniyear | country + eduprog3, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(2,3), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.70, pos=3)
+       })
+
+### Models in the subgroups
+for(edu in levels(data$eduprog3)) {
+      for(cntry in levels(data$country)) {
+            cat(sprintf("######\nGROUP : %s in %s\n######\n", edu, cntry))
+            print(summary(lm(ngknow ~ uniyear, data=data,
+                       subset = data$eduprog3==edu & data$country==cntry)))
+      }
+}
+
+############################################################
+### Analsysis of the strictly financial knowledge scores ###
+############################################################
+### Non-guessed financial knowledge scores are based on the following subset of the knowledge items with specifically financial content:
+
+### - k1, k2, k6, k8, k12, k13, k14, k18, k22, k25, k28, k30.
+
+finitems <- paste("k", c(1,2,6,8,12,13,14,18,22,25,28,30), sep="")
+ngfinance <- apply(kdat[, finitems], 1, nonguessedKnowScore)
+histogram(~ngfinance, par.settings=V4bgw, xlab="Percent of Total",
+          ylab="Non-guessed financial knowledge scores")
+summary(ngfinance)
+data$ngfinance <- ngfinance
+
+## By country
+tapply(data$ngfinance, data$country, summary) # similar, but not the same
+t.test(ngfinance ~ country, data=data, var.equal=FALSE) # no difference
+
+## By type of education
+tapply(data$ngfinance, data$eduprog3, summary)
+summary(lm(ngfinance ~ eduprog3, data=data))
+### We see that EBMF has highest scores and STEM is in the middle
+bwplot(ngfinance ~ eduprog3, data=data, par.settings=V4bgw,
+       ylab="Non-guessed financial knowledge scores")
+
+## By country and type of education
+tapply(data$ngfinance, data$edu3country, summary)
+anova(lm(ngfinance ~ country * eduprog3, data=data))
+### There is significatn interaction
+summary(lm(ngfinance ~ country * eduprog3, data=data))
+### Helper categorical joint indicator of eduprog and country
+data$edu3country <- interaction(data$eduprog3, data$country)
+bwplot(ngfinance ~ edu3country, data=data, par.settings=V4bgw,
+       ylab="Non-guessed financial knowledge scores")
+
+### Financial knowledge and liberalism-socialism
+corr.test(data[, c("ngfinance", "libsoc")]) ### significant
+### The higher socialist attitudes are the lower financial knowledge is
+### Regression model of this association
+summary(lm(ngknow ~ libsoc, data=data)) # 7% of the variance is retained
+
+### By education type
+### interaction effect
+anova(lm(ngfinance ~ libsoc * eduprog3, data=data)) # not significant
+
+### By country
+### interaction effect
+anova(lm(ngfinance ~ libsoc * country, data=data)) # notsignificant
+
+### By education type and country
+### 3-way interaction effect
+anova(lm(ngfinance ~ libsoc * country * eduprog3, data=data))
+### no 3-way and no 2-way interactions with liberalism-socialism
+
+### Financial knowledge scores and study year
+corr.test(data[, c("ngfinance", "uniyear")]) # significant relationship
+xyplot(ngfinance ~ uniyear, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(1,1), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.85, pos=3)
+       })
+summary(lm(ngfinance ~ uniyear, data=data))
+
+### Controling for country and education type
+xyplot(ngfinance ~ uniyear | country + eduprog3, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(2,3), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.70, pos=3)
+       })
+anova(lm(ngfinance ~ uniyear * country * eduprog3, data=data))
+### There are significant interaction betweem country and eduprog and 3-way interaction of this two factors and study year
+
+### Models in the subgroups
+for(edu in levels(data$eduprog3)) {
+      for(cntry in levels(data$country)) {
+            cat(sprintf("######\nGROUP : %s in %s\n######\n", edu, cntry))
+            print(summary(lm(ngfinance ~ uniyear, data=data,
+                             subset = data$eduprog3==edu & data$country==cntry)))
+      }
+}
+### No group has truly significant effect
+
+#######################################
+### SAVE THE EXTENDED FINAL DATASET ###
+#######################################
+
+finalDataExtended <- data[, -which(names(data) == "wexp")]
+write.table(finalDataExtended, sep="\t", row.names=TRUE,
+            file=normalizePath("./Data/MainData/finalDataExtended.txt"))
+save(finalDataExtended, file=normalizePath("./Data/MainData/finalDataExtended.RData"))
 
 ### Clean the workspace 
 ### (optional: uncomment to remove all objects from RStudio working memory)
