@@ -6,31 +6,22 @@
 #######################################################################
 ### Compute Agresti-Coull confidence interval for a binary variable ###
 #######################################################################
-acInterval <- function(vec, alpha = 0.05, n = NULL, x = NULL) {
-      ### This function take 4 arguments:
+acInterval <- function(vec, alpha = 0.05) {
+      ### This function take 2 arguments:
       ###   - vec : a vector of numerical binary data
       ###   - alpha : significance level
-      ###   - n : if not NULL it indicates the sample size
-      ###   - x : if not null it indicates the number of successes
-      ### In general if vec is not NULL then n and p must be NULL and vice versa
+
+      ### Check the input data
+      stopifnot(is.numeric(vec) | (is.data.frame(vec) & nrow(vec) == 1),
+                is.numeric(alpha) & length(alpha) == 1,
+                all(levels(as.factor(as.numeric(vec))) == c("0", "1")))
       
-      ### Check the input arguments
-      stopifnot(is.numeric(vec) | is.null(vec),
-                all(levels(factor(vec, ordered = TRUE)) == c("0", "1")),
-                is.null(n) | (is.numeric(n) & length(n) == 1),
-                is.null(x) | (is.numeric(x) & length(x) == 1),
-                is.numeric(alpha) & (alpha > 0 | alpha < 1))
-      if(is.null(vec) & is.null(x) & is.null(n)) stop(message = "No input data given")
-      if(!is.null(vec) & !is.null(x) & !is.null(n)) stop(message = "Give a vector or params, not both")
-      if(is.null(vec) & (is.null(n) | is.null(x))) stop(message = "Give both p and n params")
-      
+      if(is.data.frame(vec)) vec <- as.numeric(vec)
       ### Compute the z parameter
       z <- qnorm(1 - alpha/2)
+      n <- length(vec[!is.na(vec)])
+      x <- sum(vec, na.rm=TRUE)
       ### Choose the computation approach
-      if(!is.null(vec)) {
-            n <- length(vec)
-            x <- sum(vec)
-      }
       ndash <- n + z^2
       pdash <- (1/ndash) * (x + .5 * z^2)
       wing <- z * sqrt((1/ndash) * pdash * (1 - pdash))
@@ -46,7 +37,7 @@ acInterval <- function(vec, alpha = 0.05, n = NULL, x = NULL) {
 ###############################################################
 plotBinary <- function(data, ci=TRUE, reverse=FALSE, reorder=TRUE, vline=FALSE, alpha=.05, theme = NULL) {
       ### This function takes 5 arguments:
-      ###   - datac : a data.frame with the variables
+      ###   - data : a data.frame with the variables
       ###   - ci : flag indicating wheter confidence intervals should plotted (Agresti-Coull)
       ###   - reverse : flag indicating whether 1 - p should be returned instead of p
       ###   - reorder : flag indicating whether variables should be reordered
@@ -75,7 +66,8 @@ plotBinary <- function(data, ci=TRUE, reverse=FALSE, reorder=TRUE, vline=FALSE, 
       for(var in vars) {
             p <- pdat[var, "p"]
             x <- p*n
-            cint <- acInterval(vec=NULL, alpha=alpha, n=n, x=x)
+            if(reverse) cint <- acInterval(vec=1-data[, var], alpha=alpha)
+            else cint <- acInterval(vec=data[, var], alpha=alpha)
             veclo <- cint[1]
             vecup <- cint[2]
             pdat[var, "lo"] <- veclo
@@ -99,3 +91,35 @@ plotBinary <- function(data, ci=TRUE, reverse=FALSE, reorder=TRUE, vline=FALSE, 
       return(dplot)
 }
 ### !!! <--- Function 2 ---> !!! ### (END)
+
+# ### !!! <--- Function 3 ---> !!! ### (START)
+# ###############################################################################
+# ### GENERATE DATASET WITH ITEMS' DIFFICULTY LEVELS AND CONFIDENCE INTERVALS ###
+# ###############################################################################
+dlevelFrame <- function(dat, vcol=FALSE) {
+      ### Takes two arguments:
+      ###   - dat: a data.frame with binary variables
+      ###   - vcol: logical flag indicating whether varnames should be included in the first column of the frame; useful in plotting
+
+      ### Check the input data
+      stopifnot(is.data.frame(dat))
+      
+      ### Generate data
+      vnames <- names(dat)
+      m <- ncol(dat)
+      n <- nrow(dat)
+      
+      Frame <- data.frame(matrix(0, nrow=m, ncol=3))
+      rownames(Frame) <- vnames
+      colnames(Frame) <- c("difficulty", "lower", "upper")
+      
+      for(v in vnames) {
+            Frame[v, 1] <- mean(dat[, v], na.rm=TRUE)
+            Frame[v, 2:3] <- acInterval(dat[, v])
+      }
+      if(vcol) {
+            vars <- rownames(Frame)
+            Frame <- cbind(vars, Frame)
+      }
+      return(Frame)
+}

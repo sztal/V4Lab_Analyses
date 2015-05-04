@@ -6,7 +6,6 @@
 
 ### Load data
 load(normalizePath("./Data//MainData/finalData.RData"))
-source(normalizePath("./R_scripts//Visualization/Themes/LatticeThemes.R"))
 data <- fulldat
 
 ### Load packages
@@ -24,7 +23,12 @@ library(sandwich)
 library(mvtnorm)
 library(TH.data)
 library(multcomp)
+### Load plotting functions
+source(normalizePath("./R_scripts/Visualization/PlottingFunctions.R"))
+### Load processing tools
+source(normalizePath("./R_scripts//data_processing/processingTools.R"))
 ### Load V4 color theme
+source(normalizePath("./R_scripts//Visualization/Themes/LatticeThemes.R"))
 V4bgw <- V4themes("standard_bgw")
 
 #########################################
@@ -40,6 +44,76 @@ lapply(data[, c("libsoc", "ngknow", "knowraw")],
        function(x) tapply(x, data$country, summary))
 lapply(data[, c("libsoc", "ngknow", "knowraw")],
        function(x) tapply(x, data$country, quantile, na.rm=TRUE, probs=seq(0, 1, .1)))
+
+### By education type
+lapply(data[, c("libsoc", "ngknow", "knowraw")],
+       function(x) tapply(x, data$eduprog3, summary))
+lapply(data[, c("libsoc", "ngknow", "knowraw")],
+       function(x) tapply(x, data$eduprog3, quantile, na.rm=TRUE, probs=seq(0, 1, .1)))
+
+### By education type and country
+lapply(data[, c("libsoc", "ngknow", "knowraw")],
+       function(x) tapply(x, interaction(data$eduprog3, data$country), summary))
+lapply(data[, c("libsoc", "ngknow", "knowraw")],
+       function(x) tapply(x, interaction(data$eduprog3, data$country), quantile,
+                          na.rm=TRUE, probs=seq(0, 1, .1)))
+
+###########################################
+### Analysis of the KNOWLEDGE questions ###
+###########################################
+
+kdata <- data[, grep("^k[0-9]+|country|eduprog3", names(data), perl=TRUE)]
+kdat <- kdata[, grep("^k[0-9]+", names(kdata), perl=TRUE)]
+### Joint sample
+### Items difficulties with 95% Agresti-Coul confidence intervals
+diffPlot <- plotBinary(kdat, ci=TRUE, reverse=TRUE, vline=TRUE, alpha=.05)
+diffPlot <- update(diffPlot, xlab="Item Difficulty", par.settings=V4bgw)
+### Numerical summary
+diffOrd <- round(sort(sapply(kdat, 
+                             function(x) 1 - mean(x, na.rm=TRUE)), decreasing=TRUE), 3)
+JointSubsets <- list(tricky=names(diffOrd)[1:7], medium=names(diffOrd)[8:10],
+                     easy=names(diffOrd)[11:29])
+JointFrame <- dlevelFrame(kdat)
+
+### Education type
+### EBMF
+EBMFplot <- plotBinary(kdat[kdata$eduprog3=="EBMF", ], ci=TRUE, reverse=TRUE, vline=TRUE)
+EBMFplot <- update(EBMFplot, xlab="Item Difficulty", par.settings=V4bgw)
+EBMFord <- round(sort(sapply(kdat[kdata$eduprog3=="EBMF", ], 
+                             function(x) 1 - mean(x, na.rm=TRUE)), decreasing=TRUE), 3)
+
+### SSHA
+SSHAplot <- plotBinary(kdat[kdata$eduprog3=="SSHA", ], ci=TRUE, reverse=TRUE, vline=TRUE)
+SSHAplot <- update(SSHAplot, xlab="Item Difficulty", par.settings=V4bgw)
+SSHAord <- round(sort(sapply(kdat[kdata$eduprog3=="SSHA", ], 
+                             function(x) 1 - mean(x, na.rm=TRUE)), decreasing=TRUE), 3)
+
+### STEM
+STEMplot <- plotBinary(kdat[kdata$eduprog3=="STEM", ], ci=TRUE, reverse=TRUE, vline=TRUE)
+STEMplot <- update(STEMplot, xlab="Item Difficulty", par.settings=V4bgw)
+STEMord <- round(sort(sapply(kdat[kdata$eduprog3=="STEM", ], 
+                             function(x) 1 - mean(x, na.rm=TRUE)), decreasing=TRUE), 3)
+
+###############
+### COUNTRY ###
+###############
+### PL
+PLplot <- plotBinary(kdat[kdata$country=="PL", ], ci=TRUE, reverse=TRUE, vline=TRUE)
+PLplot <- update(PLplot, xlab="Item Difficulty", par.settings=V4bgw)
+PLord <- round(sort(sapply(kdat[kdata$country=="PL", ], 
+                             function(x) 1 - mean(x, na.rm=TRUE)), decreasing=TRUE), 3)
+PLSubsets <- list(tricky=names(PLord)[1:5], medium=names(PLord)[6:11],
+                     easy=names(PLord)[12:29])
+PLFrame <- dlevelFrame(kdat[kdata$country=="PL", ])
+
+### CZ
+CZplot <- plotBinary(kdat[kdata$country=="CZ", ], ci=TRUE, reverse=TRUE, vline=TRUE)
+CZplot <- update(CZplot, xlab="Item Difficulty", par.settings=V4bgw)
+CZord <- round(sort(sapply(kdat[kdata$country=="CZ", ], 
+                           function(x) 1 - mean(x, na.rm=TRUE)), decreasing=TRUE), 3)
+CZSubsets <- list(tricky=names(CZord)[1:7], medium=names(CZord)[8:10],
+                  easy=names(CZord)[11:29])
+CZFrame <- dlevelFrame(kdat[kdata$country=="CZ", ])
 
 
 ### Basic comaprisons of PL and CZ samples
@@ -63,6 +137,7 @@ lapply(data[, c("libsoc", "liberalism", "socialism", "rawlib", "rawsoc")],
 lapply(data[, c("libsoc", "liberalism", "socialism", "rawlib", "rawsoc")],
        function(x) cohen.d(x ~ data$country, pooled=TRUE))
 ### difference for socialism is medium; for lib-soc small
+bwplot(libsoc ~ country, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism")
 
 #################################################################
 ### PL vs. CZ : self-description economic and social opinions ###
@@ -101,16 +176,15 @@ lapply(data[, c("ngknow", "knowraw")],
 lapply(data[, c("ngknow", "knowraw")],
        function(x) cohen.d(x ~ data$country, pooled=TRUE))
 ### No difference
-
-
-
+bwplot(ngknow ~ country, data=data, par.settings=V4bgw,
+       ylab="Non-guessed knowledge score")
 
 ### Basic comparisons of types of education
 ##############################################
 ### Education types : Liberalism-Socialism ###
 ##############################################
 summaryBy(libsoc + liberalism + socialism + rawlib + rawsoc ~ eduprog3, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
 useOuterStrips(histogram(~libsoc+liberalism+socialism+rawlib+rawsoc | eduprog3, data=data, 
                          par.settings=V4bgw, layout=c(3,5), 
                          xlab="Liberalism-Socialism scale", ylab="Percent of Total", 
@@ -122,12 +196,13 @@ useOuterStrips(histogram(~libsoc+liberalism+socialism+rawlib+rawsoc | eduprog3, 
 ### Anovas
 lapply(data[, c("libsoc", "liberalism", "socialism", "rawlib", "rawsoc")],
        function(x) summary(lm(x ~ data$eduprog3)))
+bwplot(libsoc ~ eduprog3, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism")
 
 ##########################################
 ### Education types : Knowledge scores ###
 ##########################################
 summaryBy(ngknow + knowraw ~ eduprog3, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
 useOuterStrips(histogram(~ ngknow + knowraw | eduprog3, data=data, 
                          par.settings=V4bgw, layout=c(2,3), 
                          xlab="Knowledge Score", ylab="Percent of Total", 
@@ -137,12 +212,14 @@ useOuterStrips(histogram(~ ngknow + knowraw | eduprog3, data=data,
 ### Anovas
 lapply(data[, c("ngknow", "knowraw")],
        function(x) summary(lm(x ~ data$eduprog3)))
+bwplot(ngknow ~ eduprog3, data=data, par.settings=V4bgw,
+       ylab="Non-guessed knowledge score")
 
 ###################################################
 ### Parental education : Liberalism - Socialism ###
 ###################################################
 summaryBy(libsoc + liberalism + socialism + rawlib + rawsoc ~ peduord, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:7, ]
 useOuterStrips(histogram(~libsoc+liberalism+socialism+rawlib+rawsoc | peduord, data=data, 
                          par.settings=V4bgw, layout=c(7,5), 
                          xlab="Liberalism-Socialism scale", ylab="Percent of Total", 
@@ -174,7 +251,7 @@ corr.test(data[, c("libsoc", "leseferism.etatism",
 ### Father education : Liberalism - Socialism ###
 #################################################
 summaryBy(libsoc + liberalism + socialism + rawlib + rawsoc ~ father_edu, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:4, ]
 useOuterStrips(histogram(~libsoc+liberalism+socialism+rawlib+rawsoc | father_edu,
                          data=data, par.settings=V4bgw, layout=c(7,5), 
                          xlab="Liberalism-Socialism scale", ylab="Percent of Total", 
@@ -196,7 +273,7 @@ bwplot(libsoc ~ father_edu, data=data, par.settings=V4bgw, ylab="Liberalism-Soci
 ### Mother education : Liberalism - Socialism ###
 #################################################
 summaryBy(libsoc + liberalism + socialism + rawlib + rawsoc ~ mother_edu, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:4, ]
 useOuterStrips(histogram(~libsoc+liberalism+socialism+rawlib+rawsoc | mother_edu,
                          data=data, par.settings=V4bgw, layout=c(7,5), 
                          xlab="Liberalism-Socialism scale", ylab="Percent of Total", 
@@ -218,7 +295,7 @@ bwplot(libsoc ~ mother_edu, data=data, par.settings=V4bgw, ylab="Liberalism-Soci
 ### Parental education : KNOWLEDGE scores ###
 #############################################
 summaryBy(ngknow + knowraw ~ peduord, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:7, ]
 useOuterStrips(histogram(~ ngknow + knowraw | peduord, data=data, 
                          par.settings=V4bgw, layout=c(2,3), 
                          xlab="Knowledge Score", ylab="Percent of Total", 
@@ -238,7 +315,7 @@ bwplot(ngknow ~ peduord, data=data, ylab="Non-guessed KNOWLEDGE Scores",
 ### Father education : KNOWLEDGE scores ###
 ###########################################
 summaryBy(ngknow + knowraw ~ father_edu, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:4, ]
 useOuterStrips(histogram(~ ngknow + knowraw | father_edu, data=data, 
                          par.settings=V4bgw, layout=c(2,3), 
                          xlab="Knowledge Score", ylab="Percent of Total", 
@@ -256,7 +333,7 @@ bwplot(ngknow ~ father_edu, data=data, ylab="Non-guessed KNOWLEDGE Scores",
 ### Mother education : KNOWLEDGE scores ###
 ###########################################
 summaryBy(ngknow + knowraw ~ mother_edu, data=data, 
-          FUN=c(mean, sd), na.rm=TRUE)
+          FUN=c(mean, sd), na.rm=TRUE)[1:4, ]
 useOuterStrips(histogram(~ ngknow + knowraw | mother_edu, data=data, 
                          par.settings=V4bgw, layout=c(2,3), 
                          xlab="Knowledge Score", ylab="Percent of Total", 
@@ -298,6 +375,25 @@ xyplot(ngknow ~ libsoc | country, data=data, par.settings=V4bgw,
                            digits=2, offset=1, at=.15, pos=3)
        })
 ### In both coutnry high socialist attitudes are associated with lower KNOWLEDGE scores; however the effect is stronger in the Polish sample (10% of variance in PL vs. 4% in CZ)
+
+### Controlling for type of education
+lowerCor(data[data$eduprog3=="EBMF",
+              grep("libsoc|les.*et|mat_|ngknow", names(data), perl=TRUE)])
+lowerCor(data[data$eduprog3=="SSHA",
+              grep("libsoc|les.*et|mat_|ngknow", names(data), perl=TRUE)])
+lowerCor(data[data$eduprog3=="STEM",
+              grep("libsoc|les.*et|mat_|ngknow", names(data), perl=TRUE)])
+summary(lm(ngknow ~ libsoc*eduprog3, data=data, subset=knowIV==0))
+summary(lm(ngknow ~ libsoc, data=data, subset=knowIV==0 & eduprog3=="EBMF"))
+summary(lm(ngknow ~ libsoc, data=data, subset=knowIV==0 & eduprog3=="SSHA"))
+summary(lm(ngknow ~ libsoc, data=data, subset=knowIV==0 & eduprog3=="STEM"))
+xyplot(ngknow ~ libsoc | eduprog3, data=data, par.settings=V4bgw,
+       xlab="Liberalism-Socialism", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(1,3), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.15, pos=3)
+       })
 
 ################################################
 ### Liberalism-Socialism vs. WORK EXPERIENCE ###

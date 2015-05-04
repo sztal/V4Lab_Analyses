@@ -779,12 +779,12 @@ nonguessedKnowScore <- function(vec) {
       else {
             if(length(vec) == 1) return(vec[1])
             else {
-                  m <- length(vec)
-                  expsc <- m / 2
+                  expsc <- length(vec) / 2
                   raw <- sum(vec)
-                  plusmin <- raw - expsc
-                  guessed <- expsc - plusmin + 1
-                  ngscore <- raw - guessed
+                  #plusmin <- raw - expsc
+                  #guessed <- expsc - plusmin + 1
+                  #ngscore <- raw - guessed
+                  ngscore <- 2*raw - 2*expsc - 1
             }
       }
       return(ngscore)
