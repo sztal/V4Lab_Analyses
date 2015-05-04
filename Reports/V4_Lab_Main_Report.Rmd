@@ -505,3 +505,262 @@ xyplot(ngknow ~ libsoc | eduprog3, data=data, par.settings=V4bgw,
                            digits=2, offset=1, at=.15, pos=3)
        })
 ```
+
+## Liberalism-Socialism and work experience
+Group means clearly show that respondents with no work experience on average have a little bit stronger socialist attitudes. There is also a difference, although much smaller between up to 1 year of experience and more.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+### Boxplots for the libsoc scale
+bwplot(libsoc ~ work_experience, data=data, par.settings=V4bgw,
+       ylab="Liberalism-Socialism", xlab="Work Experience", horizontal=FALSE)
+summaryBy(libsoc ~ work_experience, data=data, 
+          FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
+```
+
+We test statistical significance of this observation using an ANOVA model with contrasts. The first contrast test wheter the first group (no experience) has higher mean of Liberalism-Socialism than the other two groups on average. The second contrast test whether the two groups of people with experience do differ.
+
+```{r, echo=FALSE}
+### Anovas
+data$wexp <- factor(data$work_experience, ordered=FALSE)
+### Test of linear constrasts:
+### I (wexp1) : no experience vs. up to 1 year and 1 year+ toghether
+### II (wexp2) : up to 1 year vs. 1year+
+### Intercept in the model corresponds to the average of cell means
+mat <- matrix(c(1/3,1/3,1/3,
+                1,-1/2,-1/2,
+                0,1,-1), 3, 3)
+mymat <- solve(t(mat))
+contrasts(data$wexp) <- mymat[, 2:3]
+summary(lm(libsoc ~ wexp, data=data))
+```
+
+We see that the first contrast (wexp1 in the output table) is significant and that the second one is not. Therefore we conclude that students who have work experience have slightly weaker socialist attitudes (the model retains about 1.5% of the variance of the liberalism-socialism scores).
+
+We also checked whether there are differences in regard to this effect between the countries. We found out that it is not the case - interaction effect is not significant. Although median positions suggest that the effect is more vivid in Poland (see the plot). However, due to the lack of a formal proof of the significance, we will make no further inquiries into it.
+
+```{r, echo=FALSE, fig.width=7, fig.height=5, fig.align='center'}
+### Controlling for country
+bwplot(libsoc ~ work_experience | country, data=data, par.settings=V4bgw,
+       ylab="Liberalism-Socialism", xlab="Work Experience", horizontal=FALSE,
+       layout=c(2, 1))
+anova(lm(libsoc ~ wexp * country, data=data)) # No interaction effect
+```
+
+
+## Knowledge scores and work experience
+Again we see that people with no work experience tend to have lower scores on average than those with some experience. The difference between the other two groups is much smaller and probably not significant.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+bwplot(ngknow ~ work_experience, data=data, ylab="Non-guessed KNOWLEDGE Scores",
+       xlab="Work Experience", horizontal=FALSE,
+       par.settings=V4bgw)
+summaryBy(ngknow + knowraw ~ wexp, data=data, 
+          FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
+```
+
+We test significance of this observation with a linera model with contrasts analogous to the ones from the previous section. And yet again we see that the first one is significant (so students with no work experience tend to have lower knowledge scores), while the second one is not (there is no difference between those with up to 1 year of experience and those with more). The model retains about 1.3% of the variance of the knowledge scores.
+
+```{r, echo=FALSE}
+### Test of linear constrasts:
+### I (wexp1) : no experience vs. up to 1 year and 1 year+ toghether
+### II (wexp2) : up to 1 year vs. 1year+
+### Intercept in the model corresponds to the average of cell means
+mat <- matrix(c(1/3,1/3,1/3,
+                1,-1/2,-1/2,
+                0,1,-1), 3, 3)
+mymat <- solve(t(mat))
+contrasts(data$wexp) <- mymat[, 2:3]
+summary(lm(ngknow ~ wexp, data=data))
+contrasts(data$wexp) <- contr.treatment(3)
+contrasts(data$work_experience) <- contr.treatment(3)
+```
+
+Additionaly we tested the difference between the countries. We found that the interaction effect is nearly significant (plots in groups also suggest interaction by which knowledge of Czech students grows with the experience, while knowledge of Polish students grow with the first year of experience and then suddenly diminishes; however we have to leave the question of whether this is a true effect or just noise unanswered due to the lack of formal significance).
+
+```{r, echo=FALSE, fig.width=7, fig.height=5, fig.align='center'}
+bwplot(ngknow ~ work_experience | country, data=data, par.settings=V4bgw,
+       ylab="Non-guessed KNOWLEDGE Scores", xlab="Work Experience", horizontal=FALSE,
+       layout=c(2, 1))
+anova(lm(ngknow ~ wexp * country, data=data))
+```
+
+## Knowledge and liberlism-socialism scores and study year
+Now we look at the influence of time spent at university on the knowledge scores and the liberalism-socialism dimension. Correlation tests prove that there is significant association only in the case of the knowledge scores. Therefore we will analyze further only this variable.
+
+```{r, echo=FALSE}
+data$uniyear <- as.numeric(data$year_at_uni)
+corr.test(data[, c("libsoc", "ngknow", "uniyear")])
+```
+
+However, we found that at level of the entire sample only about 1% of the variance of the knowledge scores is explained by study year.
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=6, fig.align='center'}
+xyplot(ngknow ~ uniyear, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(1,1), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.85, pos=3)
+       })
+summary(lm(ngknow ~ uniyear, data=data))
+```
+
+We also conditioned this effect on type of education, since it may be an important factor in this case. However, we found that there is no significant interaction effect - at level of the entire sample there is no significant differences in this regard.
+
+```{r, echo=FALSE, fig.width=7, fig.height=6, fig.align='center'}
+anova(lm(ngknow ~ uniyear*eduprog3, data=data))
+```
+
+This lack of effect may stem from other differences, that is differences between countries. Thus we tested also three-way interaction with country. We found that there is indeed a significant three-way interaction effect.
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=7.5, fig.align='center'}
+### Controling for type of education and country
+anova(lm(ngknow ~ uniyear*eduprog3*country, data=data))
+### Now we have an interaction between uniyear, country and type of education
+xyplot(ngknow ~ uniyear | country + eduprog3, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(2,3), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.70, pos=3)
+       })
+```
+
+Inspection of the plots show that there is something very interesting going on here. It seems that only Czech students gain more knowledge (mostly EBMF and STEM students) with subsequent years of studies, while Polish students do not (STEM students get even worse).
+
+Formal test of models in the subgroups showed that there are only two groups that have positive association between knowledge scores and study year and these are EBMF and STEM students in Czech Republic.
+
+```{r, echo=FALSE}
+### Models in the subgroups
+for(edu in levels(data$eduprog3)) {
+      for(cntry in levels(data$country)) {
+            cat(sprintf("######\nGROUP : %s in %s\n######\n", edu, cntry))
+            print(summary(lm(ngknow ~ uniyear, data=data,
+                       subset = data$eduprog3==edu & data$country==cntry)))
+      }
+}
+```
+
+# Financial knowledge scores analysis
+For the last part of the analysis we introduce another measure: financial knowledge scores. It is the same as the non-guessed knowledge scores but computed only for the subset of the knowledge items with strictly financial content (this was established by means of expert analysis of the items' content). This subset consists of the following items:
+
+* There are 12 financial items: **k1**, **k2**, **k6**, **k8**, **k12**, **k13**, **k14**, **k18**, **k22**, **k25**, **k28**, **k30**
+
+```{r, echo=FALSE}
+finitems <- paste("k", c(1,2,6,8,12,13,14,18,22,25,28,30), sep="")
+ngfinance <- apply(kdat[, finitems], 1, nonguessedKnowScore)
+data$ngfinance <- ngfinance
+```
+
+We see that the distirbution of the scores is nicely symemtric and on average respondents gave a bit more than one nonrandom correct answer.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+histogram(~ngfinance, par.settings=V4bgw, xlab="Percent of Total",
+          ylab="Non-guessed financial knowledge scores")
+summary(ngfinance)
+```
+
+## Financial knowledge scale scores by country and education type
+
+### By country
+There is no significant difference in regard to group means between Poland and Czech Republic and the distributions are also very similar.
+
+```{r, echo=FALSE}
+## By country
+tapply(data$ngfinance, data$country, summary) # similar, but not the same
+t.test(ngfinance ~ country, data=data, var.equal=FALSE) 
+```
+
+### By education type
+Tests show that both SSHA and STEM students have lower means than EBMF students.
+
+```{r, echo=FALSE, fig.width=7, fig.height=5, fig.align='center'}
+## By type of education
+tapply(data$ngfinance, data$eduprog3, summary)
+### We see that EBMF has highest scores and STEM is in the middle
+bwplot(ngfinance ~ eduprog3, data=data, par.settings=V4bgw,
+       ylab="Non-guessed financial knowledge scores")
+summary(lm(ngfinance ~ eduprog3, data=data))
+```
+
+### By country and education type
+The distributions in the subgroups are clearly different and there is also significant interaction effect of country and education type.
+
+```{r, echo=FALSE, fig.width=7, fig.height=5, fig.align='center'}
+### Helper categorical joint indicator of eduprog and country
+data$edu3country <- interaction(data$eduprog3, data$country)
+bwplot(ngfinance ~ edu3country, data=data, par.settings=V4bgw,
+       ylab="Non-guessed financial knowledge scores")
+anova(lm(ngfinance ~ country * eduprog3, data=data))
+```
+
+Model coefficients show that Polish EBMF students have the mean score (significantly better than Czech EBMF students) and at the same time that Polish SSHA and STEM students have lower mean scores than corresponding Czech students (it is easu to see that on the plot above).
+
+```{r, echo=FALSE}
+### There is significatn interaction
+summary(lm(ngfinance ~ country * eduprog3, data=data))
+```
+
+## Financial knowledge scores and liberalism-socialism
+There is general slight negative association between liberalism-socialism scale scores and financial knowledge scale scores (so the stronger socialist attitudes are, the lower financial scores are).
+
+```{r, echo=FALSE}
+anova(lm(ngfinance ~ libsoc * eduprog3, data=data))
+```
+
+### Financial knowledge scores and liberalism-socialism controling for education type and country
+However, additional analyses proved that this effect is universal and does not interact with education type and country. In other words it stays more or less the same regardles of these two factors.
+
+```{r, echo=FALSE}
+### By country
+### interaction effect
+anova(lm(ngfinance ~ libsoc * country, data=data)) # notsignificant
+
+### By education type and country
+### 3-way interaction effect
+anova(lm(ngfinance ~ libsoc * country * eduprog3, data=data))
+### no 3-way and no 2-way interactions with liberalism-socialism
+```
+
+## Financial knowledge scores and study year
+There is also a (slight) general association between financial knowledge scores and study year.
+
+```{r, echo=FALSE, fig.width=7, fig.height=6, fig.align='center'}
+xyplot(ngfinance ~ uniyear, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(1,1), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.85, pos=3)
+       })
+summary(lm(ngfinance ~ uniyear, data=data))
+```
+
+### Financial knowledge scores and study year controling for education type and country
+There is significant 3-way interaction between study year, contry and education type (see the plot below that depicts it very well). It implies that the association between financiel knowledge scores and study year varies between student groups in Poland and Czech Republic.
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=7, fig.align='center'}
+### Controling for country and education type
+xyplot(ngfinance ~ uniyear | country + eduprog3, data=data, par.settings=V4bgw,
+       xlab="Study year", ylab="Non-guessed KNOWLEDGE score",
+       layout=c(2,3), panel=function(x, y, ...) {
+             panel.xyplot(x, y, ..., grid=TRUE)
+             panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
+                           digits=2, offset=1, at=.70, pos=3)
+       })
+anova(lm(ngfinance ~ uniyear * country * eduprog3, data=data))
+### There are significant interaction between country and eduprog and 3-way interaction of this two factors and study year
+```
+
+Analysis of the models (financial knowledge vs. study year) in the subgroups (education type $\times$ country) gives inconclusive results. For three groups (SSHA students in Poland and Czech Republic and EBMF students in Czech Republic) it is rather certain that  there are no association between financial knowledge and study year. For the others (EBMF in Poland and STEM in both Poland and Czech Republic) the assocaition is very close to being significant (see the outputs below). It means that we rather can not rule out that there may be a positive association between financial knowledge and study year in amongst Polish EBMF studenst and Czech STEM students. Surprisngly enough we also can not rule out that there is a negative association between the variables in the group of Polish STEM students.
+
+```{r, echo=FALSE}
+### Models in the subgroups
+for(edu in levels(data$eduprog3)) {
+      for(cntry in levels(data$country)) {
+            cat(sprintf("######\nGROUP : %s in %s\n######\n", edu, cntry))
+            print(summary(lm(ngfinance ~ uniyear, data=data,
+                             subset = data$eduprog3==edu & data$country==cntry)))
+      }
+}
+```

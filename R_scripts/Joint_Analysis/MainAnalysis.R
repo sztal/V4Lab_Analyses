@@ -540,12 +540,12 @@ bwplot(ngfinance ~ eduprog3, data=data, par.settings=V4bgw,
        ylab="Non-guessed financial knowledge scores")
 
 ## By country and type of education
+### Helper categorical joint indicator of eduprog and country
+data$edu3country <- interaction(data$eduprog3, data$country)
 tapply(data$ngfinance, data$edu3country, summary)
 anova(lm(ngfinance ~ country * eduprog3, data=data))
 ### There is significatn interaction
 summary(lm(ngfinance ~ country * eduprog3, data=data))
-### Helper categorical joint indicator of eduprog and country
-data$edu3country <- interaction(data$eduprog3, data$country)
 bwplot(ngfinance ~ edu3country, data=data, par.settings=V4bgw,
        ylab="Non-guessed financial knowledge scores")
 
@@ -588,7 +588,7 @@ xyplot(ngfinance ~ uniyear | country + eduprog3, data=data, par.settings=V4bgw,
                            digits=2, offset=1, at=.70, pos=3)
        })
 anova(lm(ngfinance ~ uniyear * country * eduprog3, data=data))
-### There are significant interaction betweem country and eduprog and 3-way interaction of this two factors and study year
+### There are significant interaction between country and eduprog and 3-way interaction of this two factors and study year
 
 ### Models in the subgroups
 for(edu in levels(data$eduprog3)) {
