@@ -8,21 +8,21 @@ output:
 ---
 
 # Introduction
-This is the main technical report of the V4 Lab Project. Its aim is twofold: 1) to see what is the level of economic/financial knowledge of Polish and Czech students and what are their attitudes in regard to economic liberalism/socialism; 2) to answer the main research problem posed in this project, that is whether there is a relationship between economic and financial knowledge, liberal/socialist attitudes and type of obtained education (EBMF, SSHA and STEM). Moreover we also check potential connections between knowledge and attitudes and some sociodemographics such as parental education and work experience.
+This is the main technical report of the V4 Lab Project. Its aim is twofold: 1) to see what is the level of economic/financial knowledge of Polish and Czech students and what are their attitudes in regard to economic liberalism/interventionism; 2) to answer the main research problem posed in this project, that is whether there is a relationship between economic and financial knowledge, liberal/interventionist attitudes and type of obtained education (EBMF, SSHA and STEM). Moreover we also check potential connections between knowledge and attitudes and some sociodemographics such as parental education and work experience.
 
-We estimate level of the economic/financial knowledge by three means: 1) we investigate answer patterns to separate items (i.e. which are most diffcult etc.); 2) analyze what we call raw scores, that is sums of correct answers; 3) analyze what we call non-guessed answers, that is the number of correct answers that were not guessed. The last measure is based on an assumption that since the items were of true/false form then in the case when one does not know the correct answer the problem of answering such an item boils down to guessing with 50% chance of hit. Under this assumption it is easy to derive the number of questions that must have been answered correctly in a nonrandom fashion (that is respondent must have been quite certain that the answer he or she gives is the correct one). The number of correct answers may be computed using the following formula: $C = 2X - 2E - 1$, where C is the score, X is the actual number of correct answers given and E is the expected number of such answers (in this case this is a constant that equals 14.5, since there are 29 items with guessing chance of 50%).
+We estimate level of the economic/financial knowledge by three means: 1) we investigate answer patterns to separate items (i.e. which are most diffcult etc.); 2) analyze what we call raw scores, that is sums of correct answers; 3) analyze what we call non-guessed answers, that is the number of correct answers that were not guessed. The last measure is based on an assumption that since the items were of true/false form then in the case when one does not know the correct answer the problem of answering such an item boils down to guessing with 50% chance of a hit. Under this assumption it is easy to derive the number of questions that must have been answered correctly in a nonrandom fashion (that is respondent must have been quite certain that the answer he or she gives is the correct one). The number of correct answers may be computed using the following formula: $C = 2X - 2E$, where C is the score, X is the actual number of correct answers given and E is the expected number of such answers (in this case this is a constant that equals 14.5, since there are 29 items with guessing chance of 50%).
 
 Furthermore, KNOWLEDGE items of true/false form give us one more opportunity - it is easy to partition the item set into three subsets: 1) easy items (those with difficulty significantly below 0.5, what implies that on average respondents do know the correct answer and there is no need for guessing); 2) medium items (those around difficulty level of 0.5, what implies that on average respondents do not know the answer for sure and guess); 3) tricky items (those with difficulty significantly above 0.5, what implies that on average respondents have false beliefs about them).
 
-Liberal/socialist economic attitudes are measured using the Liberalism-Socialism preferential scale that we constructed for the purpose of this project (more information about the scale can be found in the dedicated report). This scale ranges from -8 to 8 and negative score correspond to liberal pole of it and positive to socialist (the in-sample range is a bit narrower and spans from -7 to 7). However, the extreme values of -8 and 8 are not detectable in practice for some technical reasons which we will not discuss here. This problem is not important because no respondents have answer patterns that would lead to this kind of complication.
+Liberal/interventionist economic attitudes are measured using the liberalism-interventionism preferential scale that we constructed for the purpose of this project (more information about the scale can be found in the dedicated report). This scale ranges from -8 to 8 and negative scores correspond to the liberal pole of it and positive to the interventionist one (the in-sample range is a bit narrower and spans from -7 to 7). However, the extreme values of -8 and 8 are not detectable in practice for some technical reasons which we will not discuss here. This problem is not important because no respondents have answer patterns that would lead to this kind of complication.
 
-Parental education is assessed on the basis of three variables. The first two of them are father and mother education. These are categorical variables with four levels: 1) vocational education or lower; 2) high school; 3) higher education (defiend as BA or MA or equivalent); 4) PHD and above. The levels are slightly different from the original answer categories available in the questionnaire we used, where it was more detailed. This is due to the fact that some answers were very rare and we needed to group into wider categories.
+Parental education is assessed on the basis of three variables. The first two of them are father and mother education. These are categorical variables with four levels: 1) vocational education or lower; 2) high school; 3) higher education (defiend as BA or MA or equivalent); 4) PHD and above. The levels are slightly different from the original answer categories available in the questionnaire we used, where they were more detailed. This is due to the fact that some answers were very rare and we needed to group them into wider categories.
 
 The third variable we use to asses parental education is based on the previous ones. We call it the Ordinal Indicator of Joint Parental Education (OIJPE). It is constructed as follows: 1) recode father and mother education to integers ranging from 0 to 3 in such a manner that it preserves the education levels order; 2) add the recoded variables (it creates a variable ranging from 0 to 6). Of course (as the name suggests) OIJPE should not be treated as an interval or rational variable, but only as an ordinal one.
 
 In the end we would like to introduce technical labels for some of the main variables that may appear throught the output tables in this report:
 
-* **libsoc:** Liberalism-Socialism scale
+* **libsoc:** interventionism-interventionism scale
 * **ngknow:** Non-guessed knowledge score
 * **knowraw:** Knowledge raw score
 * **peduord:** Ordinal Indicator of the Joint Parental Education (OIJPE)
@@ -63,7 +63,7 @@ V4bgw <- V4themes("standard_bgw")
 ```
 
 # Descriptive statistics for knowledge and attitudes
-Below we provide numerical summaries for the Liberalism-Socialism scale and the raw and non-guessed knowledge scores in terms of mean and positional parameters (quartiles and deciles).
+Below we provide numerical summaries for the liberalism-interventionism scale and the raw and non-guessed knowledge scores in terms of mean and positional parameters (quartiles and deciles).
 
 ## Descriptives for the Joint Sample
 
@@ -124,7 +124,7 @@ lapply(data[, c("libsoc", "ngknow", "knowraw")],
 # Analysis of the KNOWLEDGE items set
 Now we turn to the analysis of the KNOWLEDGE items set. We will partition it into subsets of easy, medium and tricky items and check whether items orderings in regard to difficulty levels are the same in different subgroups.
 
-For this purpose we will inspect numerical values of difficulty levels (difficulty of an item is of course the fraction of respondents giving the correct answer) and visualize this data using dotplots with 95% Agresti-Coul confidence intervals.
+For this purpose we will inspect numerical values of difficulty levels (difficulty of an item is of course the fraction of respondents giving the incorrect answer) and visualize this data using dotplots with 95% Agresti-Coul confidence intervals.
 
 ```{r, echo=FALSE}
 kdata <- data[, grep("^k[0-9]+|country|eduprog3", names(data), perl=TRUE)]
@@ -263,17 +263,17 @@ CZSubsets
 Clearly some items do overlap in different groups, but not all of them.
 
 # Associations analysis
-In this section we will examine various associations between knowledge scores and the Liberalism-Socialism axis as well as parental education, work experience and type of education.
+In this section we will examine various associations between knowledge scores and the liberalism-interventionism axis as well as parental education, work experience and type of education.
 
-## Liberalism-Socialism amongst Polish and Czech students
-We begin with an analysis of the differences in regard to the Liberalism-Socialism scale scores between Polish and Czech students. We see that the distributions are slightly different - the Polish one is more spread out and shifted a bit more in the direction of liberalism; however both have means above zero, that is on the 'socialist' side of the scale.
+## Liberalism-interventionism amongst Polish and Czech students
+We begin with an analysis of the differences in regard to the liberalism-interventionism scale scores between Polish and Czech students. We see that the distributions are slightly different - the Polish one is more spread out and shifted a bit more in the direction of liberalism; however both have means above zero, that is on the 'interventionist' side of the scale.
 
 ```{r, echo=FALSE, fig.width=4, fig.height=4, fig.align='center'}
-bwplot(libsoc ~ country, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism")
+bwplot(libsoc ~ country, data=data, par.settings=V4bgw, ylab="Liberalism-interventionism")
 summaryBy(libsoc ~ country, data=data, FUN=c(mean, sd), na.rm=TRUE)
 ```
 
-Formal test show that indeed Polish students are closer to the midpoint of the scale, while Czechs gravitate more to the side of socialism. Although the effect is significant its magnitude is rather small (as Cohen's $d$ coefficients shows).
+Formal test show that indeed Polish students are closer to the midpoint of the scale, while Czechs gravitate more to the side of interventionism. Although the effect is significant its magnitude is rather small (as Cohen's $d$ coefficients shows).
 
 ```{r, echo=FALSE}
 t.test(libsoc ~ country, data=data, var.equal=FALSE)
@@ -300,16 +300,16 @@ lapply(data[, c("ngknow", "knowraw")],
        function(x) cohen.d(x ~ data$country, pooled=TRUE))
 ```
 
-## Liberalism-Socialism and education type
-Now we compare education type groups (EBMF, SSHA and STEM) in a context of the Liberalism-Socailism scale scores. It is easy to see that EBMF group is shifted towards liberalism, while SSHA tends to have stronger socialist attitudes. The STEM group is between and closie to the midpoint.
+## Liberalism-interventionism and education type
+Now we compare education type groups (EBMF, SSHA and STEM) in a context of the liberalism-Socailism scale scores. It is easy to see that EBMF group is shifted towards liberalism, while SSHA tends to have stronger interventionist attitudes. The STEM group is between and closie to the midpoint.
 
 ```{r, echo=FALSE, fig.width=4, fig.height=4, fig.align='center'}
-bwplot(libsoc ~ eduprog3, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism")
+bwplot(libsoc ~ eduprog3, data=data, par.settings=V4bgw, ylab="Liberalism-interventionism")
 summaryBy(libsoc ~ eduprog3, data=data, 
           FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
 ```
 
-A formal test (ANOVA) shows that education type matters and that about 5.7% of the variance of the Liberalism-Socialism scale scores is associated with it. Moreover EBMF mean is not significantly greater than 0 (the scale's midpoint) and both STEM and SSHA groups have higher (more socialist) means than it - although this effect is stronger in the SSHA group.
+A formal test (ANOVA) shows that education type matters and that about 5.7% of the variance of the liberalism-interventionism scale scores is associated with it. Moreover EBMF mean is not significantly greater than 0 (the scale's midpoint) and both STEM and SSHA groups have higher (more interventionist) means than it - although this effect is stronger in the SSHA group.
 
 ```{r, echo=FALSE}
 summary(lm(libsoc ~ eduprog3, data=data))
@@ -331,11 +331,11 @@ summaryBy(ngknow + knowraw ~ eduprog3, data=data,
 summary(lm(ngknow ~ eduprog3, data=data))
 ```
 
-## Liberalism-Socialism and OIJPE
-Numerical values show that there is some variation in the group means, however it is hard to say whether it is something more than noise. The line on the plot depicts the linear regression model that tries to predict group means assuming that the relationship between the Liberalism-Socialism scale scores nad the OIJPE values is close to linear.
+## Liberalism-interventionism and OIJPE
+Numerical values show that there is some variation in the group means, however it is hard to say whether it is something more than noise. The line on the plot depicts the linear regression model that tries to predict group means assuming that the relationship between the liberalism-interventionism scale scores nad the OIJPE values is close to linear.
 
 ```{r, echo=FALSE, fig.width=6, fig.height=5, fig.align='center'}
-bwplot(libsoc ~ peduord, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism",
+bwplot(libsoc ~ peduord, data=data, par.settings=V4bgw, ylab="Liberalism-interventionism",
        xlab="Ordinal Indicator of Joint Parental Education", horizontal=FALSE,
        panel=function(...) {
              panel.bwplot(...)
@@ -346,17 +346,37 @@ summaryBy(libsoc ~ peduord, data=data,
           FUN=c(mean, sd), na.rm=TRUE)[1:7, ]
 ```
 
-A formal test shows that there is no significant relationship between the Liberalism-Socialism scale scores and the OIJPE scores.
+A formal test shows that there is no significant relationship between the liberalism-interventionism scale scores and the OIJPE scores.
 
 ```{r, echo=FALSE}
 summary(lm(libsoc ~ peduord, data=data))
 ```
 
-## Liberalism-Socialism and father education
+### Liberalism-interventionism and OIJPE by country
+Additionaly we checked whether the association between the OIJPE scores and liberalism-interventionism varies between the countries. Distributions conditioned on country show that interventionist attitudes are more or less constant amongst Czech students but falling with parental education amongst Polish students.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+### By country
+### Distributions
+tapply(data$libsoc, interaction(data$peduord, data$country), summary)
+bwplot(libsoc ~ peduord | country, data=data, par.settings=V4bgw, ylab="Liberalism-interventionism",
+       xlab="Ordinal Indicator of Joint Parental Education", horizontal=FALSE,
+       scales=list(x=list(labels=as.character(0:6))))
+### Clearly interventionist attitudes are more or less constant amongst Czech student, but fall with parental education amongst Polish students
+```
+
+Formal test (linear model with OIJPE $\times$ country interaction) proves the observation. Polish students' attitudes tend to be more liberal when parents have higher education.
+
+```{r, echo=FALSE}
+### Interaction model (peduord * country)
+summary(lm(libsoc ~ peduord * country, data=data))
+```
+
+## Liberalism-interventionism and father education
 Distributions in the groups suggest no strong association.
 
 ```{r, echo=FALSE, fig.width=6, fig.height=5, fig.align='center'}
-bwplot(libsoc ~ father_edu, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism",
+bwplot(libsoc ~ father_edu, data=data, par.settings=V4bgw, ylab="Liberalism-interventionism",
        xlab="Father Education", horizontal=FALSE)
 summaryBy(libsoc ~ father_edu, data=data, 
           FUN=c(mean, sd), na.rm=TRUE)[1:4, ]
@@ -368,11 +388,11 @@ A formal test confirms this supposition. There is no significant relationship be
 summary(lm(libsoc ~ father_edu, data=data))
 ```
 
-## Liberalism-Socialism and mother education
+## Liberalism-interventionism and mother education
 In this case it seems that the higher mother education is the more centrist attitudes a child has.
 
 ```{r, echo=FALSE, fig.width=6, fig.height=5, fig.align='center'}
-bwplot(libsoc ~ mother_edu, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism",
+bwplot(libsoc ~ mother_edu, data=data, par.settings=V4bgw, ylab="Liberalism-interventionism",
        xlab="Mother Education", horizontal=FALSE)
 summaryBy(libsoc ~ mother_edu, data=data, 
           FUN=c(mean, sd), na.rm=TRUE)[1:4, ]
@@ -400,6 +420,28 @@ Formal testing confirms this.
 ```{r, echo=FALSE}
 summary(lm(ngknow ~ peduord, data=data))
 ```
+
+### Knowledge scores and OIJPE by country
+Additionaly we checked whether the association between the OIJPE scores and the knowledge scores varies between the countries. Distributions conditioned on country show that the knowledge is more or less constant amongst Czech students but rises with parental education amongst Polish students.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+### By country
+### Distributions
+tapply(data$ngknow, interaction(data$peduord, data$country), summary)
+bwplot(ngknow ~ peduord | country, data=data, par.settings=V4bgw, ylab="Non-guessed KNOWLEDGE scores",
+       xlab="Ordinal Indicator of Joint Parental Education", horizontal=FALSE,
+       scales=list(x=list(labels=as.character(0:6))))
+tapply(data$peduord, data$country, table, useNA="ifany")
+```
+
+Since there is a huge sampling error in the highest OIJPE groups (this is vivid in the highest OIJPE group in Poland that has very low mean score and only 5 respondents) due to low frequencies, we conduct formal tests using a subsample limited to OIJPE scores $\leq$ 5.
+
+```{r, echo=FALSE}
+### Interaction model (peduord * country) and OIJPE <= 5
+summary(lm(ngknow ~ peduord * country, data=data, subset=data$peduord <= 5))
+```
+
+Clearly even in this subsample there is no assocaition in both countries.
 
 ## Knowledge scores and father education
 Again distributions show no pattern.
@@ -435,18 +477,18 @@ Formal testing shows that indeed there is no association between the variables.
 summary(lm(libsoc ~ mother_edu, data=data))
 ```
 
-## Knowledge scores and the Liberalism-Socialism scale
-Now we turn to the problem of the relationship between the knowledge scores and the Liberalism-Socialism scale scores. Simple correlation coefficient indicates that there may be some sort of an association. The negative value of the coefficient shows that the negative pole of the Liberalism-Socialism scale (that is liberalism) is related to better knowledge scores.
+## Knowledge scores and the liberalism-interventionism scale
+Now we turn to the problem of the relationship between the knowledge scores and the liberalism-interventionism scale scores. Simple correlation coefficient indicates that there may be some sort of an association. The negative value of the coefficient shows that the negative pole of the liberalism-interventionism scale (that is liberalism) is related to better knowledge scores.
 
 ```{r, echo=FALSE}
 lowerCor(data[, c("libsoc", "ngknow")])
 ```
 
-Regression model shows that indeed there is significant relationship of such kind; Liberalism-Socialism scale scores are associated with 6.9% of the variance of the knowledge scores and on average the stronger liberal attitude of a person is, the better knowledge score he or she gets. According to the model equation (see the plot below) a person with a score of -5 on the Liberalism-Socialism (quite strong liberal attitude) axis would give about 10 nonrandom correct answers, while a person with a score of 5 (quite strong socialist attitude) on the axis would give only about 2 nonrandom correct answers.
+Regression model shows that indeed there is significant relationship of such kind; liberalism-interventionism scale scores are associated with 6.9% of the variance of the knowledge scores and on average the stronger liberal attitude of a person is, the better knowledge score he or she gets. According to the model equation (see the plot below) a person with a score of -5 on the liberalism-interventionism (quite strong liberal attitude) axis would give about 10 nonrandom correct answers, while a person with a score of 5 (quite strong interventionist attitude) on the axis would give only about 2 nonrandom correct answers.
 
 ```{r, echo=FALSE, fig.width=7, fig.height=6, fig.align='center'}
 summary(lm(ngknow ~ libsoc, data=data, subset=knowIV==0))
-xyplot(ngknow ~ libsoc, data=data, par.settings=V4bgw, xlab="Liberalism-Socialism",
+xyplot(ngknow ~ libsoc, data=data, par.settings=V4bgw, xlab="Liberalism-interventionism",
        ylab="Non-guessed KNOWLEDGE score", panel=function(x, y, ...) {
              panel.xyplot(x, y, ..., grid=TRUE)
              panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
@@ -454,7 +496,7 @@ xyplot(ngknow ~ libsoc, data=data, par.settings=V4bgw, xlab="Liberalism-Socialis
        })
 ```
 
-### Knowledge scores and the Liberalism-Socialism scale while controlling for country
+### Knowledge scores and the liberalism-interventionism scale while controlling for country
 Now we extends the model in order to control for the effect of a country, since the dynamics of this relationship may differ between Poland and Czech Republic. Correlation coefficients in countries suggest that the effect may be weaker in amongst Czech students.
 
 ```{r, echo=FALSE}
@@ -465,14 +507,14 @@ cat("Czech sample")
 lowerCor(data[data$country=="CZ", c("libsoc", "ngknow")])
 ```
 
-Formal test indeed showed that there is a significant effect of an interaction between country and liberalism-socialism, which cause the effect in the Polish sample to be more than two times stronger than the corresponding effect in the Czech sample. In the Polish sample 10.5% of the variance of the knowledge scores is associated with the liberalism-socialism scale scores, while in the Czech sample it is only 3.5%. In the Joint Sample it is 7.8%.
+Formal test indeed showed that there is a significant effect of an interaction between country and liberalism-interventionism, which cause the effect in the Polish sample to be more than two times stronger than the corresponding effect in the Czech sample. In the Polish sample 10.5% of the variance of the knowledge scores is associated with the liberalism-interventionism scale scores, while in the Czech sample it is only 3.5%. In the Joint Sample it is 7.8%.
 
 ```{r, echo=FALSE, fig.width=7.5, fig.height=7}
 summary(lm(ngknow ~ libsoc*country, data=data, subset=knowIV==0))
 summary(lm(ngknow ~ libsoc, data=data, subset=knowIV==0 & country=="PL"))
 summary(lm(ngknow ~ libsoc, data=data, subset=knowIV==0 & country=="CZ"))
 xyplot(ngknow ~ libsoc | country, data=data, par.settings=V4bgw,
-       xlab="Liberalism-Socialism", ylab="Non-guessed KNOWLEDGE score",
+       xlab="Liberalism-interventionism", ylab="Non-guessed KNOWLEDGE score",
        layout=c(1,2), panel=function(x, y, ...) {
              panel.xyplot(x, y, ..., grid=TRUE)
              panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
@@ -480,7 +522,7 @@ xyplot(ngknow ~ libsoc | country, data=data, par.settings=V4bgw,
        })
 ```
 
-### Knowledge scores and the Liberalism-Socialism scale while controlling for education type
+### Knowledge scores and the liberalism-interventionism scale while controlling for education type
 Correlation coefficients in group suggest that the relationship is much stronger in the EBMF group.
 
 ```{r, echo=FALSE}
@@ -493,12 +535,12 @@ cat("STEM")
 lowerCor(data[data$eduprog3=="STEM", c("libsoc", "ngknow")])
 ```
 
-Formal test confirms that there is an interaction between education type and liberalism-socialism scores. The model parameters show that in this case the interaction means that in the EBMF group association between liberalims-socialism scoresn and knowledge scores is much stronger (in SSHA group it is even non-existent - see the equations on the plot). The model with interaction explains about 22.7% of the variance (fractions of variance explained in the subgroup are on the plot).
+Formal test confirms that there is an interaction between education type and liberalism-interventionism scores. The model parameters show that in this case the interaction means that in the EBMF group association between liberalims-interventionism scoresn and knowledge scores is much stronger (in SSHA group it is even non-existent - see the equations on the plot). The model with interaction explains about 22.7% of the variance (fractions of variance explained in the subgroup are on the plot).
 
 ```{r, echo=FALSE, fig.width=7.5, fig.height=7}
 summary(lm(ngknow ~ libsoc*eduprog3, data=data, subset=knowIV==0))
 xyplot(ngknow ~ libsoc | eduprog3, data=data, par.settings=V4bgw,
-       xlab="Liberalism-Socialism", ylab="Non-guessed KNOWLEDGE score",
+       xlab="Liberalism-interventionism", ylab="Non-guessed KNOWLEDGE score",
        layout=c(1,3), panel=function(x, y, ...) {
              panel.xyplot(x, y, ..., grid=TRUE)
              panel.ablineq(lm(y ~ x), r.sq=TRUE, rot=TRUE, lwd=2, lty=2, col="black",
@@ -506,18 +548,18 @@ xyplot(ngknow ~ libsoc | eduprog3, data=data, par.settings=V4bgw,
        })
 ```
 
-## Liberalism-Socialism and work experience
-Group means clearly show that respondents with no work experience on average have a little bit stronger socialist attitudes. There is also a difference, although much smaller between up to 1 year of experience and more.
+## Liberalism-interventionism and work experience
+Group means clearly show that respondents with no work experience on average have a little bit stronger interventionist attitudes. There is also a difference, although much smaller between up to 1 year of experience and more.
 
 ```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
 ### Boxplots for the libsoc scale
 bwplot(libsoc ~ work_experience, data=data, par.settings=V4bgw,
-       ylab="Liberalism-Socialism", xlab="Work Experience", horizontal=FALSE)
+       ylab="Liberalism-interventionism", xlab="Work Experience", horizontal=FALSE)
 summaryBy(libsoc ~ work_experience, data=data, 
           FUN=c(mean, sd), na.rm=TRUE)[1:3, ]
 ```
 
-We test statistical significance of this observation using an ANOVA model with contrasts. The first contrast test wheter the first group (no experience) has higher mean of Liberalism-Socialism than the other two groups on average. The second contrast test whether the two groups of people with experience do differ.
+We test statistical significance of this observation using an ANOVA model with contrasts. The first contrast test wheter the first group (no experience) has higher mean of liberalism-interventionism than the other two groups on average. The second contrast test whether the two groups of people with experience do differ.
 
 ```{r, echo=FALSE}
 ### Anovas
@@ -534,14 +576,14 @@ contrasts(data$wexp) <- mymat[, 2:3]
 summary(lm(libsoc ~ wexp, data=data))
 ```
 
-We see that the first contrast (wexp1 in the output table) is significant and that the second one is not. Therefore we conclude that students who have work experience have slightly weaker socialist attitudes (the model retains about 1.5% of the variance of the liberalism-socialism scores).
+We see that the first contrast (wexp1 in the output table) is significant and that the second one is not. Therefore we conclude that students who have work experience have slightly weaker interventionist attitudes (the model retains about 1.5% of the variance of the liberalism-interventionism scores).
 
 We also checked whether there are differences in regard to this effect between the countries. We found out that it is not the case - interaction effect is not significant. Although median positions suggest that the effect is more vivid in Poland (see the plot). However, due to the lack of a formal proof of the significance, we will make no further inquiries into it.
 
 ```{r, echo=FALSE, fig.width=7, fig.height=5, fig.align='center'}
 ### Controlling for country
 bwplot(libsoc ~ work_experience | country, data=data, par.settings=V4bgw,
-       ylab="Liberalism-Socialism", xlab="Work Experience", horizontal=FALSE,
+       ylab="Liberalism-interventionism", xlab="Work Experience", horizontal=FALSE,
        layout=c(2, 1))
 anova(lm(libsoc ~ wexp * country, data=data)) # No interaction effect
 ```
@@ -584,8 +626,8 @@ bwplot(ngknow ~ work_experience | country, data=data, par.settings=V4bgw,
 anova(lm(ngknow ~ wexp * country, data=data))
 ```
 
-## Knowledge and liberlism-socialism scores and study year
-Now we look at the influence of time spent at university on the knowledge scores and the liberalism-socialism dimension. Correlation tests prove that there is significant association only in the case of the knowledge scores. Therefore we will analyze further only this variable.
+## Knowledge and liberlism-interventionism scores and study year
+Now we look at the influence of time spent at university on the knowledge scores and the liberalism-interventionism dimension. Correlation tests prove that there is significant association only in the case of the knowledge scores. Therefore we will analyze further only this variable.
 
 ```{r, echo=FALSE}
 data$uniyear <- as.numeric(data$year_at_uni)
@@ -701,14 +743,14 @@ Model coefficients show that Polish EBMF students have the mean score (significa
 summary(lm(ngfinance ~ country * eduprog3, data=data))
 ```
 
-## Financial knowledge scores and liberalism-socialism
-There is general slight negative association between liberalism-socialism scale scores and financial knowledge scale scores (so the stronger socialist attitudes are, the lower financial scores are).
+## Financial knowledge scores and liberalism-interventionism
+There is general slight negative association between liberalism-interventionism scale scores and financial knowledge scale scores (so the stronger interventionist attitudes are, the lower financial scores are).
 
 ```{r, echo=FALSE}
 anova(lm(ngfinance ~ libsoc * eduprog3, data=data))
 ```
 
-### Financial knowledge scores and liberalism-socialism controling for education type and country
+### Financial knowledge scores and liberalism-interventionism controling for education type and country
 However, additional analyses proved that this effect is universal and does not interact with education type and country. In other words it stays more or less the same regardles of these two factors.
 
 ```{r, echo=FALSE}
@@ -719,7 +761,7 @@ anova(lm(ngfinance ~ libsoc * country, data=data)) # notsignificant
 ### By education type and country
 ### 3-way interaction effect
 anova(lm(ngfinance ~ libsoc * country * eduprog3, data=data))
-### no 3-way and no 2-way interactions with liberalism-socialism
+### no 3-way and no 2-way interactions with liberalism-interventionism
 ```
 
 ## Financial knowledge scores and study year

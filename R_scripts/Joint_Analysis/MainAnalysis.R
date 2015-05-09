@@ -247,6 +247,19 @@ lowerCor(data[, c("libsoc", "leseferism.etatism",
 corr.test(data[, c("libsoc", "leseferism.etatism",
                    "mat_econimic", "mat_social", "peduord")])
 
+### By country
+### Distributions
+tapply(data$libsoc, interaction(data$peduord, data$country), summary)
+bwplot(libsoc ~ peduord | country, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism",
+       xlab="Ordinal Indicator of Joint Parental Education", horizontal=FALSE,
+       scales=list(x=list(labels=as.character(0:6))))
+### Clearly interventionist attitudes are more or less constant amongst Czech student, but fall with parental education amongst Polish students
+
+### Interaction model (peduord * country)
+summary(lm(libsoc ~ peduord * country, data=data))
+### There is slight linear tren in the PL sample
+### the higher joint parental education, the stronger liberalism
+
 #################################################
 ### Father education : Liberalism - Socialism ###
 #################################################
@@ -310,6 +323,24 @@ lapply(data[, c("ngknow", "knowraw")],
 bwplot(ngknow ~ peduord, data=data, ylab="Non-guessed KNOWLEDGE Scores",
        xlab="Ordinal Joint Parental Education Indicator", horizontal=FALSE,
        par.settings=V4bgw)
+
+### By country
+### Distributions
+tapply(data$ngknow, interaction(data$peduord, data$country), summary)
+bwplot(ngknow ~ peduord | country, data=data, par.settings=V4bgw, ylab="Non-guessed KNOWLEDGE scores",
+       xlab="Ordinal Indicator of Joint Parental Education", horizontal=FALSE,
+       scales=list(x=list(labels=as.character(0:6))))
+### Very low knowledge in the highest group in Poland is probably due to the sampling error, since this group is very small (n=5)
+### Therefore we will test models including the highest group and not
+
+### Interaction model with OIJPE <= 6 (peduord * country)
+summary(lm(ngknow ~ peduord * country, data=data))
+### no association
+### Interaction model with OIJPE <= 5 (peduord * country)
+### no association either
+summary(lm(ngknow ~ peduord * country, data=data, subset=data$peduord <= 5))
+
+tapply(data$peduord, data$country, table)
 
 ###########################################
 ### Father education : KNOWLEDGE scores ###
@@ -454,7 +485,6 @@ mymat <- solve(t(mat))
 contrasts(data$wexp) <- mymat[, 2:3]
 summary(lm(ngknow ~ wexp, data=data))
 contrasts(data$wexp) <- contr.treatment(3)
-contrasts(data$work_experience) <- contr.treatment(3)
 ### We se that the first contrast is significant, while the second is not
 ### Therefore it may be concluded that respondens with work experience have higher economic/financial knowledge
 bwplot(ngknow ~ work_experience, data=data, ylab="Non-guessed KNOWLEDGE Scores",
@@ -513,6 +543,70 @@ for(edu in levels(data$eduprog3)) {
                        subset = data$eduprog3==edu & data$country==cntry)))
       }
 }
+
+##############################################
+### Liberalism-socialism and hometown size ###
+##############################################
+### There are different variable levels in the Czech and Polish sample, so we already split the analysis by country
+### By country
+L <- tapply(data$libsoc, interaction(data$hometown_size, data$country), summary)
+L[as.logical(Map(Negate(is.null), L))]
+
+### Create hometown size variables for countries
+### CZ
+CZ_hsize <- data$hometown_size
+CZ_hsize[data$country != "CZ"] <- NA
+CZ_hsize <- droplevels(CZ_hsize)
+### PL
+PL_hsize <- data$hometown_size
+PL_hsize[data$country != "PL"] <- NA
+PL_hsize <- droplevels(PL_hsize)
+### Add new variables to the dataset
+data$PL_hsize <- PL_hsize
+data$CZ_hsize <- CZ_hsize
+
+### rather similar distributions
+### PL
+bwplot(libsoc ~ hometown_size, data=data[data$country=="PL", ], par.settings=V4bgw,
+       ylab="Liberalism-interventionism score")
+### CZ
+bwplot(libsoc ~ hometown_size, data=data[data$country=="CZ", ], par.settings=V4bgw,
+       ylab="Liberalism-interventionism score")
+### no apparent and systematic differences; rather only noise
+
+### Formal tests within countries
+### PL
+anova(lm(libsoc ~ PL_hsize, data=data, subset=data$country=="PL"))
+### CZ
+anova(lm(libsoc ~ CZ_hsize, data=data, subset=data$country=="CZ"))
+### nothing happens here
+
+#######################################################
+### Knowledge scores and hometown size (by country) ###
+#######################################################
+L <- lapply(data[, c("ngknow", "knowraw")],
+            function(x) tapply(x, interaction(data$hometown_size, data$country), 
+                               summary))
+cat("######\nNon-guessed scores\n######\n")
+L[[1]][as.logical(Map(Negate(is.null), L[[1]]))]
+cat("######\nRaw scores\n######\n")
+L[[2]][as.logical(Map(Negate(is.null), L[[2]]))]
+
+### Plots
+### PL
+bwplot(ngknow ~ hometown_size, data=data[data$country=="PL", ], par.settings=V4bgw,
+       ylab="Liberalism-interventionism score")
+### CZ
+bwplot(ngknow ~ hometown_size, data=data[data$country=="CZ", ], par.settings=V4bgw,
+       ylab="Liberalism-interventionism score")
+### no apparent and systematic differences
+
+### Formal tests within countries
+### PL
+anova(lm(ngknow ~ PL_hsize, data=data, subset=data$country=="PL"))
+### CZ
+anova(lm(ngknow ~ CZ_hsize, data=data, subset=data$country=="CZ"))
+### nothing going on here
 
 ############################################################
 ### Analsysis of the strictly financial knowledge scores ###
@@ -599,6 +693,94 @@ for(edu in levels(data$eduprog3)) {
       }
 }
 ### No group has truly significant effect
+
+### FINANCIAL KNOWLEDGE AND HOMWETOWN SIZE ###
+L <- tapply(data$ngfinance, interaction(data$hometown_size, data$country), summary)
+L[as.logical(Map(Negate(is.null), L))]
+
+### Plots
+### PL
+bwplot(ngfinance ~ hometown_size, data=data[data$country=="PL", ], par.settings=V4bgw,
+       ylab="Liberalism-interventionism score")
+### CZ
+bwplot(ngfinance ~ hometown_size, data=data[data$country=="CZ", ], par.settings=V4bgw,
+       ylab="Liberalism-interventionism score")
+### no apparent and systematic differences
+
+### Formal tests within countries
+### PL
+anova(lm(ngfinance ~ PL_hsize, data=data, subset=data$country=="PL"))
+### CZ
+anova(lm(ngfinance ~ CZ_hsize, data=data, subset=data$country=="CZ"))
+### nothing going on here
+
+###########################################################################
+### Self-descriptory variables and parental education and hometown size ###
+###########################################################################
+
+### Leseferism-etatism axis and soceco matrix vs. OIJPE
+lapply(data[, c("leseferism.etatism", "mat_econimic", "mat_social")],
+       function(x) tapply(x, data$peduord, summary))
+### Leseferism-etatism
+bwplot(leseferism.etatism ~ peduord, data=data, par.settings=V4bgw,
+       ylab="Leseferism-etatism axis", horizontal=FALSE,
+       scales=list(x=list(labels=as.character(0:6))))
+### Formal test
+summary(lm(leseferism.etatism ~ peduord, data=data)) # nothing
+### Interaction with country
+summary(lm(leseferism.etatism ~ peduord * country, data=data)) # nothing
+
+### Economic dimension of the matrix
+bwplot(mat_econimic ~ peduord, data=data, par.settings=V4bgw,
+       ylab="Matrix: economic", horizontal=FALSE,
+       scales=list(x=list(labels=as.character(0:6))))
+### Formal test
+summary(lm(mat_econimic ~ peduord, data=data)) # nothing
+### Interaction with country
+summary(lm(mat_econimic ~ peduord * country, data=data)) # nothing
+
+### Social dimension of the matrix
+bwplot(mat_social ~ peduord, data=data, par.settings=V4bgw,
+       ylab="Matrix: economic", horizontal=FALSE,
+       scales=list(x=list(labels=as.character(0:6))))
+### Formal test
+summary(lm(mat_social ~ peduord, data=data)) # nothing
+### Interaction with country
+summary(lm(mat_social ~ peduord * country, data=data)) # nothing
+
+### Social dimension of the matrix vs. hometown size
+### PL
+tapply(data[data$country=="PL", "mat_social"], data[data$country=="PL", "PL_hsize"],
+       summary)
+bwplot(mat_social ~ PL_hsize, data=data[data$country=="PL", ], par.settings=V4bgw,
+       ylab="Matrix: social")
+summary(lm(mat_social ~ hometown_size, data=data, subset=data$country=="PL"))
+### linear contrast is significant in Poland; the bigger hometown is the less conservative a respondent is
+
+### CZ
+tapply(data[data$country=="CZ", "mat_social"], data[data$country=="CZ", "CZ_hsize"],
+       summary)
+bwplot(mat_social ~ CZ_hsize, data=data[data$country=="CZ", ], par.settings=V4bgw,
+       ylab="Matrix: social")
+summary(lm(mat_social ~ hometown_size, data=data, subset=data$country=="CZ"))
+### no association in the Czech sample
+
+############################################################################
+### Correlations between liberalism-interventionism and self-description ###
+############################################################################
+
+### Joint sample
+corr.test(data[, c("libsoc", "leseferism.etatism", "mat_econimic", "mat_social")])
+### Yep, it works as it should
+
+### PL sample
+corr.test(data[data$country == "PL",
+               c("libsoc", "leseferism.etatism", "mat_econimic", "mat_social")])
+### Yep, it works as it should
+
+### CZ sample
+corr.test(data[data$country == "CZ",
+               c("libsoc", "leseferism.etatism", "mat_econimic", "mat_social")])
 
 #######################################
 ### SAVE THE EXTENDED FINAL DATASET ###
