@@ -784,7 +784,7 @@ nonguessedKnowScore <- function(vec) {
                   #plusmin <- raw - expsc
                   #guessed <- expsc - plusmin + 1
                   #ngscore <- raw - guessed
-                  ngscore <- 2*raw - 2*expsc - 1
+                  ngscore <- 2*raw - 2*expsc
             }
       }
       return(ngscore)
