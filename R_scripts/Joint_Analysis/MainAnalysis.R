@@ -304,6 +304,47 @@ lapply(data[, c("libsoc", "liberalism", "socialism", "rawlib", "rawsoc")],
 bwplot(libsoc ~ mother_edu, data=data, par.settings=V4bgw, ylab="Liberalism-Socialism",
        xlab="Mother Education", horizontal=FALSE)
 
+######################################################################
+### Joint parental higher education and liberalism-interventionism ###
+######################################################################
+### Indicator of whether no paretns have higher edu, one of them has it or both
+Q <- data[, c("father_edu", "mother_edu")]
+phighedu <- vector(mode="character", length=nrow(data))
+phighedu[apply(Q, 1, function(x) all(x == "higher_edu" | x == "PHD+"))] <- "HE:both"
+phighedu[apply(Q, 1, function(x) sum(x == "higher_edu"| x == "PHD+") == 1)] <- "HE:one"
+phighedu[apply(Q, 1, function(x) all(x != "higher_edu" & x != "PHD+"))] <- "HE:none"
+phighedu <- factor(phighedu, levels=c("HE:none", "HE:one", "HE:both"), ordered=TRUE)
+data$phighedu <- phighedu
+rm(Q)
+
+### Distributions
+tapply(data$libsoc, data$phighedu, summary)
+bwplot(libsoc ~ phighedu, data=data, par.settings=V4bgw,
+       ylab="Liberalism-interventionism")
+### Formal test
+summary(lm(libsoc ~ phighedu, data=data)) # nothing really here...
+
+### By country
+### Distributions
+tapply(data$libsoc, interaction(data$phighedu, data$country), summary)
+bwplot(libsoc ~ phighedu | country, data=data, par.settings=V4bgw,
+       ylab="Liberalism-interventionism")
+### clearly there is something going on in Poland
+### Interaction model
+anova(lm(libsoc ~ phighedu * country, data=data)) # significant interaction
+summary(lm(libsoc ~ phighedu * country, data=data))
+
+
+### But the effect is rather non-linear (both parents with higher education only reall matters)
+### Se we use helmert coding to check the effect
+contrasts(data$phighedu) <- contr.helmert(3)
+### Interaction model
+anova(lm(libsoc ~ phighedu * country, data=data))
+summary(lm(libsoc ~ phighedu * country, data=data))
+### higher + higher in Poland is clearly significant!
+### Reset the contrasts
+contrasts(data$phighedu) <- NULL
+
 #############################################
 ### Parental education : KNOWLEDGE scores ###
 #############################################
@@ -378,6 +419,33 @@ bwplot(ngknow ~ mother_edu, data=data, ylab="Non-guessed KNOWLEDGE Scores",
        xlab="Mother Education", horizontal=FALSE,
        par.settings=V4bgw)
 
+############################################################
+### Joint parental higher education and knowledge scores ###
+############################################################
+
+### Distributions
+tapply(data$ngknow, data$phighedu, summary)
+bwplot(ngknow ~ phighedu, data=data, par.settings=V4bgw,
+       ylab="Non-guessed KNOWLDGE scores")
+### Formal testing (this time we use dummy coding contrasts)
+contrasts(data$phighedu) <- contr.treatment(3)
+summary(lm(ngknow ~ phighedu, data=data))
+### for some reason HE:one has weaker knowledge... but it look rather noisy
+
+### By country
+tapply(data$ngknow, interaction(data$phighedu, data$country), summary)
+bwplot(ngknow ~ phighedu | country, data=data, par.settings=V4bgw,
+       ylab="Non-guessed KNOWLDGE scores")
+### But in both countries it seems the relationship is similar...
+### interaction effect
+### lack of interaction, and the effect of education is not really significant
+anova(lm(ngknow ~ phighedu * country, data=data))
+### We check the contrast that compare the HE:one group to the others
+### Joint sample
+summary(lm(ngknow ~ relevel(factor(phighedu, ord=F), ref=2),
+           data=data))
+### Bot groups have higher knowledge than HE:one... strange, but true.
+         
 #################################################
 ### Liberalism-Socialism vs. KNOWLEDGE scores ###
 #################################################

@@ -404,6 +404,59 @@ However, formal testing does not confirm this.
 summary(lm(libsoc ~ mother_edu, data=data))
 ```
 
+## Liberalism-interventionism and higher education of both parents
+We prepared one more indicatior of joint parental education (since the OIJPE indicator has a terrible loss of information), that is focused strictly on whether parents have higher education or not. It takes on 3 values: 1) none of the parents have higher education; 2) one of the do have it; 3) both do.
+
+Distributions indicate no association at the level of the joint sample.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+######################################################################
+### Joint parental higher education and liberalism-interventionism ###
+######################################################################
+### Indicator of whether no paretns have higher edu, one of them has it or both
+Q <- data[, c("father_edu", "mother_edu")]
+phighedu <- vector(mode="character", length=nrow(data))
+phighedu[apply(Q, 1, function(x) all(x == "higher_edu" | x == "PHD+"))] <- "HE:both"
+phighedu[apply(Q, 1, function(x) sum(x == "higher_edu"| x == "PHD+") == 1)] <- "HE:one"
+phighedu[apply(Q, 1, function(x) all(x != "higher_edu" & x != "PHD+"))] <- "HE:none"
+phighedu <- factor(phighedu, levels=c("HE:none", "HE:one", "HE:both"), ordered=TRUE)
+data$phighedu <- phighedu
+rm(Q)
+
+### Distributions
+tapply(data$libsoc, data$phighedu, summary)
+bwplot(libsoc ~ phighedu, data=data, par.settings=V4bgw,
+       ylab="Liberalism-interventionism")
+```
+
+And the formal test confirms this lack of association (since the variable is ordinal we tested linear and quadratic trends in contrasts).
+
+```{r, echo=FALSE}
+### Formal test
+summary(lm(libsoc ~ phighedu, data=data)) # nothing really here...
+```
+
+### Liberalism-interventionism and joint parental higher education by country
+We checked whether this lack of association still holds within countries. Distributions suggest that there is something going on here in Poland, where respondents with both parents having higher education seem to be more liberal than the others.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+### By country
+### Distributions
+tapply(data$libsoc, interaction(data$phighedu, data$country), summary)
+bwplot(libsoc ~ phighedu | country, data=data, par.settings=V4bgw,
+       ylab="Liberalism-interventionism")
+```
+
+Since the distributions indicate that there is a sudden non-linear jump in the Polish sample, we use helmert contrasts to test formally the effect of parental education in countries (and we of course interact it with country). Helmert coding check on 2 things: 1) it tests whether the second groups has higher mean than the first one; 2) it tests whether the third groups has higher mean than the first two on average.
+
+```{r, echo=FALSE}
+anova(lm(libsoc ~ phighedu * country, data=data)) # significant interaction
+summary(lm(libsoc ~ phighedu * country, data=data))
+```
+
+Thie first output table shows that the interaction between parental education and country is significant. The second table shows that it is significant because the second helmert contrast in Poland is significant. This means that the liberalism-interventionism dimension is more or less independent from parental higher education in Czech Republic, but in Poland if both parents have higher educaton then their children tend to be more liberal. 
+
+
 ## Knowledge scores and OIJPE
 Distributions suggest that there is no clear relationship with the OIJPE scores.
 
@@ -476,6 +529,41 @@ Formal testing shows that indeed there is no association between the variables.
 ```{r, echo=FALSE}
 summary(lm(libsoc ~ mother_edu, data=data))
 ```
+
+## Knowledge scores and joint parental higher education
+Distributions indicate that respondents with only one parent having higher education may have lower knowledge than the two other groups.
+
+```{r, echo=FALSE, fig.width=5, fig.height=5, fig.align='center'}
+### Distributions
+tapply(data$ngknow, data$phighedu, summary)
+bwplot(ngknow ~ phighedu, data=data, par.settings=V4bgw,
+       ylab="Non-guessed KNOWLDGE scores")
+```
+
+This seem strange, so we check whether this is not confounded by country. Cealry it is not, in both countries the effect are very similar.
+
+```{r, echo=FALSE, fig.width=5, fig.height=4, fig.align='center'}
+### By country
+tapply(data$ngknow, interaction(data$phighedu, data$country), summary)
+bwplot(ngknow ~ phighedu | country, data=data, par.settings=V4bgw,
+       ylab="Non-guessed KNOWLDGE scores")
+```
+
+We formally test the interaction effect to see if it is really not important.
+
+```{r, echo=FALSE}
+### lack of interaction, and the effect of education is not really significant
+anova(lm(ngknow ~ phighedu * country, data=data))
+```
+
+And it is not. Thus we use dummy coding contrasts to test whether the knowledge in the HE:one groups is really lower (in the joint sample) than in the other two.
+
+```{r, echo=FALSE}
+summary(lm(ngknow ~ relevel(factor(phighedu, ord=F), ref=2),
+           data=data))
+```
+
+Clearly, both HE:both and HE:none have higher mean knowledge scores.
 
 ## Knowledge scores and the liberalism-interventionism scale
 Now we turn to the problem of the relationship between the knowledge scores and the liberalism-interventionism scale scores. Simple correlation coefficient indicates that there may be some sort of an association. The negative value of the coefficient shows that the negative pole of the liberalism-interventionism scale (that is liberalism) is related to better knowledge scores.
