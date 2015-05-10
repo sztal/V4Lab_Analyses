@@ -850,6 +850,9 @@ corr.test(data[data$country == "PL",
 corr.test(data[data$country == "CZ",
                c("libsoc", "leseferism.etatism", "mat_econimic", "mat_social")])
 
+### remove contarsts in phighedu
+contrasts(data$phighedu) <- NULL
+
 #######################################
 ### SAVE THE EXTENDED FINAL DATASET ###
 #######################################
