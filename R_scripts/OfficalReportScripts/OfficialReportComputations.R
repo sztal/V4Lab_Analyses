@@ -57,23 +57,14 @@ dv.stem <- ((t.stem$conf.int[2] - diff.stem) / qt(.975, t.stem$parameter))^2
 ### Difference variance vector
 dvars <- c(dv.ebmf, dv.ssha, dv.stem)
 
-### Group weights
-w.all <- sum(!is.na(data$libsoc[!is.na(data$eduprog3)]))
-w.ebmf <- sum(data$eduprog3=="EBMF" & !is.na(data$libsoc), na.rm=TRUE)
-w.ssha <- sum(data$eduprog3=="SSHA" & !is.na(data$libsoc), na.rm=TRUE)
-w.stem <- sum(data$eduprog3=="STEM" & !is.na(data$libsoc), na.rm=TRUE)
+### Mean difference (we assume the groups in the population have similar sizes)
+mdiff <- mean(diffs)
+### Mean difference variance (of course the assumptions stays unchanged)
+mdvar <- mean(dvars)
+mdsd <- sqrt(mdvar) # mean standard error of the difference
 
-### Weights vector
-weights <- c(w.ebmf, w.ssha, w.stem)
-
-### Weighted difference
-wdiff <- sum(diffs*(weights / w.all))
-
-### Pooled variance of the weighted difference
-pdvar <- sum( ((weights-1)*dvars) / (w.all - 1) )
-pdsd <- sqrt(pdvar)
 ### 95% normal CI for the weighted difference
-wdCI95 <- wdiff + c(-1,1)*pdsd*qt(.975, df=t.all$parameter)
+mdCI95 <- mdiff + c(-1,1)*mdsd*1.96
 
 ######################################
 ### Associations between variables ###
@@ -185,3 +176,67 @@ pairwise.t.test(data$libsoc, data$work_experience)
 ### Means and sds
 summaryBy(libsoc ~ work_experience, data=data,
           FUN=c(mean, sd, function(x, na.rm) sum(!is.na(x))), na.rm=TRUE)
+
+#####################################
+### Item difficulties differences ###
+#####################################
+
+kdata.cz <- data.cz[, grep("^k[0-9]+", names(data.cz), perl=TRUE)]
+kdata.pl <- data.pl[, grep("^k[0-9]+", names(data.pl), perl=TRUE)]
+
+# Difficulties in countries
+diffs.cz <- dlevelFrame(kdata.cz)
+diffs.pl <- dlevelFrame(kdata.pl)
+
+# Difference significance (PL - CZ)
+# data.frame indicating significant differences + difference 95% confidence intervals
+diffFrame <- data.frame(sig=rep(0, ncol(kdata.pl)),
+                        lo=rep(0, ncol(kdata.pl)),
+                        diff=rep(0, ncol(kdata.pl)),
+                        up=rep(0, ncol(kdata.pl)),
+                        PL=rep(0, ncol(kdata.pl)),
+                        CZ=rep(0, ncol(kdata.pl)))
+rownames(diffFrame) <- names(kdata.pl)
+for(item in names(kdata.pl)) {
+      counts <- c(sum(kdata.pl[, item], na.rm=TRUE),
+                  sum(kdata.cz[, item], na.rm=TRUE))
+      trials <- c(sum(!is.na(kdata.pl[, item])),
+                  sum(!is.na(kdata.cz[, item])))
+      fails <- trials - counts
+      diffs <- fails / trials
+      test <- prop.test(fails, trials)
+      cat(sprintf("### Item: %s", item))
+      print(test)
+      if(test$p.value <= 0.05) diffFrame[item, "sig"] <- 1
+      diffFrame[item, "lo"] <- test$conf.int[1]
+      diffFrame[item, "diff"] <- diffs[1] - diffs[2]
+      diffFrame[item, "up"] <- test$conf.int[2]
+      diffFrame[item, "PL"] <- diffs[1]
+      diffFrame[item, "CZ"] <- diffs[2]
+}
+
+# Joint dotplot
+# Joint diff frame
+diffs.joint <- 1 - cbind(diffs.pl, diffs.cz)[c(1,3,2,4,6,5)]
+names(diffs.joint) <- c("PL.diff", "PL.lo", "PL.up", "CZ.diff", "CZ.lo", "CZ.up")
+diffs.joint <- cbind(item=rownames(diffs.joint), diffs.joint)
+# Plot
+dotplot(reorder(item, PL.diff) ~ PL.diff, data=diffs.joint,
+        par.settings=list(superpose.symbol=list(pch=list(1, 17),
+                                                cex=1.5,
+                                                col="black")),
+        xlab="Item difficulty",
+        lo.PL=diffs.joint$PL.lo, up.PL=diffs.joint$PL.up,
+        lo.CZ=diffs.joint$CZ.lo, up.CZ=diffs.joint$CZ.up,
+        panel=function(x, y, lo.PL, up.PL, lo.CZ, up.CZ, subscripts, ...) {
+              panel.dotplot(x, y, col="black", pch="O", cex=1.2, ...)
+              #panel.arrows(x0=lo.PL, y0=y,
+              #             x1=up.PL, y1=y, code=3,
+              #             angle=90, length=0.05, col="gray3")
+              panel.dotplot(diffs.joint$CZ.diff[subscripts], y,
+                            col="black", pch=17, cex=1.2, ...)
+              #panel.arrows(x0=lo.CZ, y0=y,
+              #             x1=up.CZ, y1=y, code=3,
+              #             angle=90, length=0.05, col="indianred3")
+        }, subscripts=TRUE, auto.key=list(text=c("PL", "CZ"), rows=2, cex=1.2,
+                                          space="right"))
