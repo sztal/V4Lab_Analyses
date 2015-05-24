@@ -1,0 +1,237 @@
+---
+title: "Codebook"
+author: "Szymon Talaga"
+date: "24.05.2015"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+# Codebook
+This document describes all variables in the official V4 Lab Project dataset and their possible values. It is also available in the Polish language version.
+
+## Main indicators
+This section describes the main variables in the dataset. Dataset working labels of the variables are displayed next to the actual names of variables.
+
+### Non-guessed economic-financial knowledge scores : `ngknow`
+
+**Type:** ordinal; may be treated as continuous (quasi-interval)
+
+**Range:** -29 --- 29
+
+This is the indicator of the financial-economic knowledge of the respondents (KNOWLEDGE items set). It estimates the number of questions a respondent must have had known correct answers to, provided he or she had tried to guess (with 50% chance of success) all other items he or she had not known correct answers to, in order to obtain the get the total number of correct question he or she gave in the end.
+
+It is computed using the following formula: $S = 2X - L$, where $S$ is the non-guessed score, $X$ the total number of correct answers and $L$ the lengh of the scale (total number of items).
+
+It is important to note that this indicator may have negative values. In such cases the value corresponds to the number of items for which a respondent must have had confused the incorrect with the correct answer.
+
+The contents of the items may be found in the English translation of the questions.
+
+### Non-guessed financial knowledge scores : `ngfinance`
+
+**Type:** ordinal; may be treated as continuous (quasi-interval)
+
+**Range:** -12 --- 12
+
+This is analogous indicator as the non-guessed economic-financial knowledge scores. In fact this is a nested scale that is limited only to items: 1, 2, 6, 8, 12, 13, 14, 18, 22, 25, 28, 30. These questions refer specifically to financial problems.
+
+### Raw economic-financial scores : `knowraw`
+
+**Type:** ordinal; may be treated as continuous (quasi-interval)
+
+**Range** 0 --- 29
+
+This is simply the total number of correct answers given to the questions concerning economic and financial issues (KNOWLEDGE items).
+
+### Liberalism-interventionism scale : `L.I.scale`
+
+**Type:** ordinal; may be treated as continuous (true interval)
+
+**Range** -7 --- 7
+
+This variable measure attitudes in regard to the role of the state in economy in terms of economic liberalism-interventionism. This is a formal IRT non-parametric, unidimensional, bipolar, preferntial scale constructed using the MUDFOLD approach of Van Schuur. The first pole (negative values) corresponds to liberalist attitudes; the second (positive values) to the interventionist attitudes.
+
+The scale has poor lower bound for classic reliability (Cronbach's-$\alpha$ is about 0.60), but satisfactory model goodness-of-fit. Moreover, additional analysis suggests that it is theoretically valid. More information on the scale may be found in the .pdf report on this topic.
+
+The scale is based on 8 items from the OPINION items set. These item are: 11, 13, 14, 19 (liberalism pole), 4, 7, 20, 21 (interventionism pole).
+
+### Type of education : `typeofedu`
+
+**Type:** categorical (nominal)
+
+**Values:**
+
+* `EBMF` (economy, bussiness studies, management, finance etc.)
+* `SSHA` (social sciences, humanities, art)
+* `STEM` (science, technology, engineering, mathematics)
+
+This is an indicator of a type of university programme a respondent was enrolled in at the time of the study.
+
+### Country : `country`
+
+**Type:** categorical (nominal)
+
+**Values:**
+
+* `CZ` (Czech Republic)
+* `PL` (Poland)
+
+### Joint higher education of parents : `phighedu`
+
+**Type:** categorical (ordinal)
+
+**Values:**
+
+* `HE:none` (none of the parents have higher education)
+* `HE:one` (one of the parents has higher education)
+* `HE:both` (both of the parents have higher education)
+
+### Father education : `father_edu`
+
+**Type:** categorical (ordinal)
+
+**Values:**
+
+* `<=vocational` (vocational or lower education)
+* `high_school` (high school education)
+* `higher_edu` (higher education; BA or MA or equivalent)
+* `PHD+` (PHD or higher education/academic status)
+
+### Mother education : `mother_edu`
+
+**Type:** categorical (ordinal)
+
+**Values:**
+
+* `<=vocational` (vocational or lower education)
+* `high_school` (high school education)
+* `higher_edu` (higher education; BA or MA or equivalent)
+* `PHD+` (PHD or higher education/academic status)
+
+### Gender : `gender`
+
+**Type:** categorical (nominal)
+
+**Values:**
+
+* `female`
+* `male`
+
+### Age : `age`
+
+**Type:** continuous (true ratio)
+
+**Range:** 19 --- 30
+
+### Study year : `study_year`
+
+**Type:** categorical (ordinal)
+
+**Values:**
+
+* `BA_1` (1st year of BA or equivalent)
+* `BA_2` (2nd year of BA or equivalent)
+* `BA_3` (3rd year of BA or equivalent)
+* `MA_1` (1st year of MA or equivalent)
+* `MA_2` (2nd year of MA or equivalent)
+
+### Study year (numerical) : `study_year_numeric`
+
+**Type:** ordinal; may be treated as continuous (true ratio)
+
+**Range:** 1 --- 5
+
+### Work experience : `work_experience`
+
+**Type:** categorical (ordinal)
+
+**Values:**
+
+* `No_experience` (no work experience)
+* `Up_to_1_year` (up to one year of work experience)
+* `1_year+` (more than one year of work experience)
+
+### Hometown size in thousands (Polish classification) : `PL_home_size`
+
+**Type:** categorical (ordinal)
+
+**Values:**
+
+* `<10k` (less than 10 thousands of inhabitants)
+* `10k-100k` (from 10 to 100 thousands of inhabitants)
+* `100k-500k` (from 100 to 500 thousands of inhabitants)
+* `>500k` (more than 500 thousands of inhabitants)
+
+### Hometown size in thousands (Czech classification) : `CZ_home_size`
+
+**Type:** categorical (ordinal)
+
+**Values:**
+
+* `<1k` (less than 1 thousand of inhabitants)
+* `1k-5k` (from 1 to 5 thousands of inhabitants)
+* `5k-20k` (from 5 to 20 thousands of inhabitants)
+* `20k-100k` (from 20 to 100 thousands of inhabitants)
+* `>100k` (more than 100 thousands of inhabitants)
+
+### Interaction of type of education and country : `typeofedu.country`
+
+**Type:** categorical (nominal)
+
+* `EBMF.CZ`
+* `SSHA.CZ`
+* `STEM.CZ`
+* `EBMF.PL`
+* `SSHA.PL`
+* `STEM.PL`
+
+This is a helper variable, just for the convenience of an analyst.
+
+### Leseferism-etatism axis : `L.E.axis`
+
+**Type:** continuous (quasi-interval)
+
+**Range:** 0 --- 10
+
+This is a self-descriptory variables that indicates how the respondent perceived his or her viewpoints on the role of the state in economy. Low values correspond to the leseferist doctrine of a limited state; high values correspond to keynesian/etatist doctrine of state interventionism.
+
+### Economic dimension of the viewpoint matrix : `matrix_economic`
+
+**Type:** ordinal; may be treated as continuous (quasi-interval)
+
+**Range:** 1 --- 4
+
+This is the one of the two variables that compose the matrix of social-economic viewpoints of respondents. The matrix is another way for respondents to describe how they perceive their standpoint in regard to economic and social issues. In case of the economic dimension of the matrix, low values correspond to socialist attitudes and high values to liberal attitudes.
+
+### Social dimension of the viewpoint matrix : `matrix_social`
+
+**Type:** ordinal; may be treated as continuous (quasi-interval)
+
+**Range:** 1 --- 4
+
+This is the one of the two variables that compose the matrix of social-economic viewpoints of respondents. The matrix is another way for respondents to describe how they perceive their standpoint in regard to economic and social issues. In case of the social dimension of the matrix, low values correspond to leftist social attitudes and high values to coservative social attitudes.
+
+### Economic-financial knowledge questions : `k1` to `k30` (excluding `k9`)
+
+**Type:** categorical (binary)
+
+**Values:**
+
+* `1` (correct answer)
+* `0` (incorrect answer)
+
+This is a set of 29 questions that concern various economic and financial issues. They are supposed to measure respondents economic-financial knowledge.
+
+### Opinion on the role of the state in economy : `o1` to `o23`
+
+**Type:** categorical (trichotomous answer)
+
+**Values:**
+
+* `Agree`
+* `Disagree`
+* `DontKnow` (no opinion)
+
+This is a set of 23 questions that address various economic and social issues in regard to the role a state should play them. They form a basis of the L.-I. scale.
+
+The questions have form of statements, to which respondents have to determine whether they agree with them, disagree or do not have opinion on the topic.

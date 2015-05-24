@@ -1,0 +1,238 @@
+---
+title: "Codebook PL"
+author: "Szymon Talaga"
+date: "24.05.2015"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+# Codebook
+Dokument ten opisuje wszystkie zmienne uwzględnione w oficjalnym zbiorze danych projektu V4 Lab razem z zakresami wartości, jakie mogą przyjmować. Dostępny jest również w angielskiej wersji językowej.
+
+## Główne wskaźniki
+Ta sekcja opisuje główne wskaźniki w zbiorze danych. Etykiety zmiennych przedstawiono obok właściwych nazw.
+
+
+### Wiedza finansowo-ekonomiczna - nielosowe poprawne odpowiedzi : `ngknow`
+
+**Typ:** porządkowa; może być traktowana jak ilościowa (quasi-przedziałowa)
+
+**Rozstęp:** -29 --- 29
+
+Jest to wskaźnik wiedzy ekonomiczno-finansowej respondentów (zbiór pytań WIEDZA). Jest to oszacowanie liczby poprawnych odpowiedzi, które musiał znać badany, aby uzyskać swoją całkowitą liczbę poprawnych odpowiedzi, przy założeniu, że w przypadku nieznajomości poprawnej odpowiedzi, zgaduje ją z 50% szansą na sukces.
+
+Wskaźnik ten jest obliczany według następującego wzoru: $S = 2X - L$, gdzie $S$ to nielosowe poprawne odpowiedzi, $X$ całkowita liczba poprawnych odpowiedzi, a $L$ to ilość pytań w skali.
+
+Należy zaznaczyć, że wskaźnik ten może przyjmować ujemne wartości. W takim przypadku jego wartość odpowiada liczbie pytań, w przypadku których respondent musiał uznać nieprawidłową odpowiedź za prawidłową, aby uzyskać swój wynik (przy założeniu, że na pozostałe pytania odpowiadał losowo).
+
+Treści pytań można znaleźć w polskiej wersji kwestionariusza (wersja angielska w dedykowanym tej kwestii dokumencie pliku).
+
+### Wiedza finansowa - nielosowe poprawne odpowiedzi : `ngfinance`
+
+**Typ:** porządkowa; może być traktowana jak ilościowa (quasi-przedziałowa)
+
+**Rozstęp:** -12 --- 12
+
+Jest wskaźnik analogiczny do poprzedniego i mierzy on wiedza finansową respondentów. W istocie jest on zagnieżdżony w skali wiedzy ekonomiczno-finansowej, jako że oparty jest on o podzbiór pytań typu WIEDZA. Są to pozycje: 1, 2, 6, 8, 12, 13, 14, 18, 22, 25, 28, 30. Odnoszą się one do kwestii stricte finansowych.
+
+### Wiedza ekonomiczno-finansowa - poprawne odpowiedzi : `knowraw`
+
+**Typ:** porządkowa; może być traktowana jak ilościowa (quasi-przedziałowa)
+
+**Rozstęp** 0 --- 29
+
+Jest to po prostu całkowita ilość poprawnie udzielonych odpowiedzi na pytania o wiedzę ekonomiczno-finansową.
+
+### Skala liberalizmu-interwencjonizmu : `L.I.scale`
+
+**Typ:** porządkowa; może być traktowana jak ilościowa (przedziałowa)
+
+**Rozstęp** -7 --- 7
+
+Zmienna ta mierzy poglądy względem roli państwa w gospodarce w kategoriach ekonomicznego liberalizmu-interwencjonizmu. Jest to formala skala typu IRT o charakterze nieparametrycznym, jednowymiarowym, dwubiegunowym i preferencyjnym. Skonstruowana została za pomocą techniki MUDFOLD opracowanej przez Van Schuura. Pierwszy biegun (wartości ujemne) odnoszi się do postaw liberalnych; drugi biegun (wartości dodatnie) do postaw interwencjonistycznych.
+
+Skala ma niską dolną granicę błędu pomiaru ($\alpha$-Cronbacha w okoliach 0,60), ale odpowiednią dobroć dopasowania do modelu skali preferncyjnej. Ponadto, dodatkowe analizy pokazały, że ma ona również wystarczająco trafność teoretyczną. Więcej informacji na temat skali można znaleźć w raporcie .pdf jej poświęconym.
+
+Skala oparta jest o 8 pytań z ze zbioru OPINIE. Są to pozycje: 11, 13, 14, 19 (biegun liberalizmu) oraz 4, 7, 20, 21 (biegun interwencjonizmu).
+
+### Typ studiów : `typeofedu`
+
+**Typ:** kategorialny (nominalny)
+
+**Wartości:**
+
+* `EBMF` (ekonomia, biznes, zarządzanie, fianse etc.)
+* `SSHA` (nauki społeczne, humanistyka, studia artystyczne)
+* `STEM` (nauki ścisłe i techniczne, inżynieria, matematyka)
+
+Jest to wskaźnik rodzaju studiów wyższych, na które uczęszczali respondenci w momencie udzału w badnaiu.
+
+### Kraj : `country`
+
+**Typ:** kategorialny (nominalny)
+
+**Wartości:**
+
+* `CZ` (Czechy)
+* `PL` (Polska)
+
+### Łącznie wyższe wykształcenie rodziców : `phighedu`
+
+**Type:** kategorialna (porządkowa)
+
+**Wartości:**
+
+* `HE:none` (żadne z rodziców nie ma wyższego wykształcenia)
+* `HE:one` (jedno z rodziców ma wyższe wykształcenie)
+* `HE:both` (oboje rodzice mają wyższe wykształcenie)
+
+### Wykształcenie ojca : `father_edu`
+
+**Typ:** kategorialna (porządkowa)
+
+**Wartości:**
+
+* `<=vocational` (zawodowe i niższe)
+* `high_school` (liceum i równoważne)
+* `higher_edu` (licencjat/inżynier, magister i równoważne)
+* `PHD+` (doktorat i powyżej)
+
+### Wykształcenie matki : `mother_edu`
+
+**Typ:** kategorialna (porządkowa)
+
+**Wartości:**
+
+* `<=vocational` (zawodowe i niższe)
+* `high_school` (liceum i równoważne)
+* `higher_edu` (licencjat/inżynier, magister i równoważne)
+* `PHD+` (doktorat i powyżej)
+
+### Płeć : `gender`
+
+**Typ:** kategorialna (nominalna)
+
+**Wartości:**
+
+* `female` (kobieta)
+* `male` (mężczyzna)
+
+### Wiek : `age`
+
+**Typ:** ilościowa (ilorazowa)
+
+**Zasięg:** 19 --- 30
+
+### Rok studiów : `study_year`
+
+**Typ:** kategorialna (porządkowa)
+
+**Wartości:**
+
+* `BA_1` (1szy rok licencjatu i równoważne)
+* `BA_2` (2gi rok licencjatu i równoważne)
+* `BA_3` (3ci rok licencjatu i równoważne)
+* `MA_1` (1szy rok licencjatu i równoważne)
+* `MA_2` (2gi rok licencjatu i równoważne)
+
+### Rok studiów (numeryczny) : `study_year_numeric`
+
+**Typ:** porządkowa; może być traktowana jak ilościowa (ilorazowa)
+
+**Range:** 1 --- 5
+
+### Doświadczenie zawodowe : `work_experience`
+
+**Typ:** kategorialna (porządkowa)
+
+**Wartości:**
+
+* `No_experience` (brak doświadczenia)
+* `Up_to_1_year` (do roku doświadczenia)
+* `1_year+` (więcej niż rok doświadczenia)
+
+### Wielkość miejscowości zamieszkania w tysiącach (klasyfikacja polska) : `PL_home_size`
+
+**Typ:** kategorialna (porządkowa)
+
+**Wartości:**
+
+* `<10k` (mniej niż 10 tysięcy mieszkańców)
+* `10k-100k` (od 10 do 100 tysięcy mieszkańców)
+* `100k-500k` (od 100 do 500 tysięcy mieszkańców)
+* `>500k` (więcej niż 500 tysięcy mieszkańców)
+
+### Wielkość miejscowości pochodzenia w tysiącach (klasyfikacja czeska) : `CZ_home_size`
+
+**Typ:** kategorialna (porządkowa)
+
+**Wartości:**
+
+* `<1k` (mniej niż tysiąc mieszkańców)
+* `1k-5k` (od tysiąca do 5 tysięcy mieszkańców)
+* `5k-20k` (od 5 do 10 tysięcy mieszkańców)
+* `20k-100k` (od 20 do 100 mieszkańców)
+* `>100k` (ponad 100 tysięcy mieszkańców)
+
+### Interakcja typu studiów z krajem : `typeofedu.country`
+
+**Type:** kategorialna (nominalna)
+
+* `EBMF.CZ`
+* `SSHA.CZ`
+* `STEM.CZ`
+* `EBMF.PL`
+* `SSHA.PL`
+* `STEM.PL`
+
+Jest to pomocniczna zmienna stworzona dla wygody analityka.
+
+### Oś leseferyzmu-etatyzmu : `L.E.axis`
+
+**Typ:** ilościowa (quasi-przedziałowa)
+
+**Rozstęp:** 0 --- 10
+
+Jest to zmienna samoopisowa dotycząca tego, jak respondent ocenia swoje poglądy wobec roli państwa w gospodarce. Niskie wartości odpowiadają leseferystycznej doktrynie ograniczonego państwa; wysokie odpowiadają keynsowskiej/etatystycznej doktrynie interwencjonistycznej.
+
+### Wymiar ekonomiczny macierzy poglądów : `matrix_economic`
+
+**Typ:** porządkowa; może być traktowana jak ilościowa (quasi-przedziałowa)
+
+**Rozstęp:** 1 --- 4
+
+Jest to jedna z dwóch zmiennych, które składają się na macierz poglądów społeczno-ekonomicznych respondentów. Macierz jest kolejnym narzędziem dla badanych do określenie swoich poglądów względem spraw społecznych i ekonomicznych. W przypadku wymiaru ekonomicznego macierzy niskie wartości odpowiadają postawom socjalistycznym, zaś wysokie liberalnym.
+
+### Wymiar społeczny macierzy poglądów : `matrix_economic`
+
+**Typ:** porządkowa; może być traktowana jak ilościowa (quasi-przedziałowa)
+
+**Rozstęp:** 1 --- 4
+
+Jest to jedna z dwóch zmiennych, które składają się na macierz poglądów społeczno-ekonomicznych respondentów. Macierz jest kolejnym narzędziem dla badanych do określenie swoich poglądów względem spraw społecznych i ekonomicznych. W przypadku wymiaru społecznego macierzy niskie wartości odpowiadają postawom lewicowym społecznie, zaś wysokie konserwatywnym.
+
+### Pytania o wiedzę ekonomiczno-finansową : `k1` do `k30` (bez `k9`)
+
+**Typ:** kategorialna (binarna)
+
+**Wartości:**
+
+* `1` (odpowiedź poprawna)
+* `0` (odpowiedź niepoprawna)
+
+Jest to zbiór 29 pytań odnoszących się do rozmaitych zagadnień ekonomicznych i finansowych. Ma on w zamierzeniu służyć pomiarowi wiedzy ekonomiczno-finansowej.
+
+### Pytania o opinie na temat roli państwa w gospodarce : `o1` do `o23`
+
+**Typ:** kategorialne (odpowiedzi trychotomiczne)
+
+**Wartości:**
+
+* `Agree` (Zgadzam się)
+* `Disagree` (Nie zgadzam się)
+* `DontKnow` (Nie mam zdania)
+
+Jest to zbiór 23 pytań odnoszących się do rozmaitych ekonomicznych i społecznych zagadnie” w odniesieniu do roli, jaką powinno pełnić w nich państwo. Stanowią one podstawę skali L.-I.
+
+Pytania mają formę stwierdzeń, wobec których należy się określić, czy się z nimi zgadza, nie zgadzam, lub nie ma się na ten temat zdania.
