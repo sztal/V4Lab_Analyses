@@ -28,7 +28,7 @@ This section presents brief description of all directories that are used through
 	* *RawData* : Here the raw data is stored. The raw comes in two flavours - true raw and quasi-raw. True raw datasets (CZ_rawdata.csv and PL_rawdata.csv) contain the raw data, that is exactly what was transferred from the paper questionnaires to the digital .csv sheets. In general this means that the raw files contain the raw input from the respondents with only one exeption - the data is anonimized. Quasi-raw data (CZ_main and PL_main) are the datasets that are translated to English (so they do not contain any non-ASCII characterts) and are properly recoded. The quasi-raw data is stored in two formats: .txt and .RData. Those who work in R are recommended to use .RData files since they retain the proper structure of all variables (factor variables remain factors, ordered factors remain ordered factors etc.).
 	* *MainData* : Here the processed datasets are stored. All datasets here are represented as .txt (with \t as a field separator) and .RData files. Again, R users are recommended to use .RData files. More info about the files here is to be found in the Map of Files (below).
 	* *Maps* : this directory stores helper files that are used to map respondents' answers to correct answers in order to properly recode KNOWLEDGE questions and also files that map items (from KNOWLEDGE and OPINION sets) to their semantic content. 
-	* *OfficialData* : this directory stores the official dataset with proper naming and coding of variables. It also contains the script that generates it.
+	* *OfficialData* : this directory stores the official dataset with proper naming and coding of variables. It also contains the script that generates it. It stores the codebooks (PL and ENG version) as well.
 
 * **R_scripts** : This directory stores all R scripts that were used for the purpose of data processing and analysis.
 	* *data_processing* : here all scripts used to process the data are stored. Data processing includes: producing recoded data from the raw data, removing outlying respondents and missing data imputation. Moreover, scripts with custom data processing functions are stored here as well. Especially all routines used for MUDFOLF type scaling of the set of items measuring opinions (in regard to economic liberlism-interventionism) are implemented here in the script: processingTools.R 
@@ -88,6 +88,8 @@ Step-by-step procedure to obtain the final working and final official datasets (
 
 * **Data/OfficialData**
 	* *officialData.txt/.RData* ---> this is the dataset with proper naming and coding of all important variables. Unimportant and superfluous variables have been removed from it. This dataset is recommended to use by external analysts.
+	* *Codebook.pdf/.Rmd* ---> this is a description of the variables in the official dataset (in English).
+	* *Codebook.pdf/.Rmd* ---> this is a description of the variables in the official dataset (in Polish).
 
 * **Data/Maps**	
 	* *CorrectAnswersMap_KNOWLEDGE.csv* : the file is a map that maps respondents' answers to the KNOWLEDGE items to correct items. It is used to compute respondents' raw scores (total number of correct answers).
