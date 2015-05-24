@@ -22,10 +22,13 @@ Through out the scripts, reports and other materials and documents in the reposi
 ## Directories description
 This section presents brief description of all directories that are used throughout the analysis in order to keep the analysis structured and legible.
 
+* **Questionnaires** : Here the questionnaire (Polish and Czech version) are stored. Moreover it contains OPINION and KNOWLEDGE items English translations.
+
 * **Data** : Here the datasets are stored. 
 	* *RawData* : Here the raw data is stored. The raw comes in two flavours - true raw and quasi-raw. True raw datasets (CZ_rawdata.csv and PL_rawdata.csv) contain the raw data, that is exactly what was transferred from the paper questionnaires to the digital .csv sheets. In general this means that the raw files contain the raw input from the respondents with only one exeption - the data is anonimized. Quasi-raw data (CZ_main and PL_main) are the datasets that are translated to English (so they do not contain any non-ASCII characterts) and are properly recoded. The quasi-raw data is stored in two formats: .txt and .RData. Those who work in R are recommended to use .RData files since they retain the proper structure of all variables (factor variables remain factors, ordered factors remain ordered factors etc.).
 	* *MainData* : Here the processed datasets are stored. All datasets here are represented as .txt (with \t as a field separator) and .RData files. Again, R users are recommended to use .RData files. More info about the files here is to be found in the Map of Files (below).
 	* *Maps* : this directory stores helper files that are used to map respondents' answers to correct answers in order to properly recode KNOWLEDGE questions and also files that map items (from KNOWLEDGE and OPINION sets) to their semantic content. 
+	* *OfficialData* : this directory stores the official dataset with proper naming and coding of variables. It also contains the script that generates it.
 
 * **R_scripts** : This directory stores all R scripts that were used for the purpose of data processing and analysis.
 	* *data_processing* : here all scripts used to process the data are stored. Data processing includes: producing recoded data from the raw data, removing outlying respondents and missing data imputation. Moreover, scripts with custom data processing functions are stored here as well. Especially all routines used for MUDFOLF type scaling of the set of items measuring opinions (in regard to economic liberlism-interventionism) are implemented here in the script: processingTools.R 
@@ -33,7 +36,7 @@ This section presents brief description of all directories that are used through
 	* *PL_Analysis* : Here all scripts used in the analysis of the Polish sample are stored.
 	* *CZ_Analysis* : Here all scripts used in the analysis of the Czech sample are stored.
 	* *Join_Analysis* : Here all scripts used in the analysis of the Join sample (PL + CZ) are stored. These are the most important scripts that presents actually important (i.e. not only technical) analyses. 
-	* *OfficalReportScripts* : This folder stores a script that replicates all computations done in the official report of the V4 Lab Project. Additionaly there is also a script that prepares the official datasets (.RData and .txt format).
+	* *OfficalReportScripts* : This folder stores a script that replicates all computations done in the official report of the V4 Lab Project.
 
 * **Reports** : here we store .Rmd (R markdown) files with reports on the main parts of the data production/analytic procedures.
 
@@ -82,7 +85,16 @@ Step-by-step procedure to obtain the final working and final official datasets (
 	* *fulldat.txt/.RData* : This dataset consists of all main variables and also has the scale of opinions in regard to economic liberalism-interventionism. In general this scale is called the Liberalism-Interventionism scale (the L.-I. scale). Psychometric qualities of the scale are assessed in this script and validation in subsamples is conducted. The outcomes are not too great, but it seems that satisfactory level of theoretical validity is met.
 	* *finalData.txt/.RData* : Here the non-guessed KNOWLEDGE scores (both economic-financial and strictly financial) are added alongside some syntetic indicators of paretnal education (they are not used; the joint parents' higher education indicator is added only in the finalDataExtended dataset).
 	* *finalDataExtended.txt/.RData* : Here an indicator of joint higher education of parents' is added together with some minor changes in coding and naming of variables.
+
+* **Data/OfficialData**
 	* *officialData.txt/.RData* ---> this is the dataset with proper naming and coding of all important variables. Unimportant and superfluous variables have been removed from it. This dataset is recommended to use by external analysts.
+
+* **Data/Maps**	
+	* *CorrectAnswersMap_KNOWLEDGE.csv* : the file is a map that maps respondents' answers to the KNOWLEDGE items to correct items. It is used to compute respondents' raw scores (total number of correct answers).
+	* *Joint_OPINION_map.csv* : the file maps anwers to the OPINION items to the characteristic answers of the liberal and interventionist poles of the L.-I. scale. It is used in the OPINION scaling procedure.
+	* *L.I.scale_map.csv* : this is almost the same file, but divided by country (it does not make any difference in fact; characteristic answers are the same in both countries).
+	* *PL_items_map_KNOWLEDGE.csv* : this file maps KNOWLEDGE items to their semantic contents in Polish.
+	* *PL_items_map_OPINIONS.csv* : this file maps OPINION items to their semantic contents in Polish.
 
 * **R_scripts/data_processing**
 	* *CZ_data_processing.R* : This script produces CZ_main.txt/.RData from CZ_rawdata.csv (see the Map of Files). It is densely commented to provide stepby-step explanation of all decisions that had to be taken during this stage of data processing.
