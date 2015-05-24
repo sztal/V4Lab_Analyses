@@ -14,6 +14,7 @@ data <- finalDataExtended
 
 ### Generate dataset
 fdat <- data[, c("ngknow", "ngfinance")]
+fdat$knowraw <- data$knowraw
 fdat$L.I.scale <- data$libsoc
 fdat$typeofedu <- data$eduprog3
 fdat$country <- data$country
