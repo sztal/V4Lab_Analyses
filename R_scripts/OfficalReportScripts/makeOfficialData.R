@@ -28,6 +28,9 @@ fdat$work_experience <- data$work_experience
 fdat$PL_home_size <- data$PL_hsize
 fdat$CZ_home_size <- data$CZ_hsize
 fdat$typeofedu.country <- data$edu3country
+fdat$L.E.axis <- data$leseferism.etatism
+fdat$matrix_economic <- data$mat_econimic
+fdat$matrix_social <- data$mat_social
 fdat <- cbind(fdat, data[, grep("^(o|k)[0-9]+", names(data), perl=TRUE)])
 ### Add more informative rownames
 rownames(fdat)[fdat$country == "PL"] <- paste("pl", 1:length(fdat$country[fdat$country=="PL"]), sep="")

@@ -2,7 +2,7 @@
 ### KNOWLEDGE NON-GUESSED SCORES + ORDINAL JOINT PARENTAL EDUCATION ###
 #######################################################################
 
-### This script adds last variables: KNOWLEDGE raw scores and npn-guessed scores and ordinal scale of joint parental education; then it generates the final dataset
+### This script adds last variables: KNOWLEDGE raw scores and non-guessed scores and ordinal scale of joint parental education; then it generates the final dataset
 
 ### Load data
 load(normalizePath("./Data//MainData/fulldat.RData"))
