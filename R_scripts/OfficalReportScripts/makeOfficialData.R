@@ -33,6 +33,8 @@ fdat$L.E.axis <- data$leseferism.etatism
 fdat$matrix_economic <- data$mat_econimic
 fdat$matrix_social <- data$mat_social
 fdat <- cbind(fdat, data[, grep("^(o|k)[0-9]+", names(data), perl=TRUE)])
+levels(fdat$PL_home_size)[levels(fdat$PL_home_size) == "<10k-100k"] <- "10k-100k"
+levels(fdat$CZ_home_size)[levels(fdat$CZ_home_size) == "<1k-5k"] <- "1k-5k"
 ### Add more informative rownames
 rownames(fdat)[fdat$country == "PL"] <- paste("pl", 1:length(fdat$country[fdat$country=="PL"]), sep="")
 rownames(fdat)[fdat$country == "CZ"] <- paste("cz", 1:length(fdat$country[fdat$country=="CZ"]), sep="")
