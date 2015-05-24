@@ -1,7 +1,9 @@
 # V4Lab_Analyses
 This repository stores all data and analytic scripts of the V4 Lab project.
 
-More information will be provided in the README file (that is here) soon.
+The aim of the project is to measure of economical and financial knowledge of Czech and Polish students as well as assess their opinions in terms of economic liberalism-interventionism. Furthermore, we also try to shed some light on the associations between the knowledge and the opinions as well as other potentialy important sociodemographical variables (such as parents' education and type of education).
+
+More information can be found on the project's website: [http://v4lab.eu/](http://v4lab.eu/).
 
 ## Directories description
 This section presents brief description of all directories that are used throughout the analysis in order to keep the analysis structured and legible.
